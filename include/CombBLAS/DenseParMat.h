@@ -35,7 +35,7 @@
 #include <mpi.h>
 #include <vector>
 
-// #include "CombBLAS.h"
+#include "CombBLAS.h"
 #include "Operations.h"
 #include "MPIOp.h"
 #include "FullyDistVec.h"

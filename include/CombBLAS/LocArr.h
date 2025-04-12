@@ -30,9 +30,6 @@
 #ifndef _LOC_ARR_H_
 #define _LOC_ARR_H_
 
-#include <cstddef>
-#include <vector>
-
 namespace combblas {
 
 template<class V, class C>

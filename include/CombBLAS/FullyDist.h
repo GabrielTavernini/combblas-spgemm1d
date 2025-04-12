@@ -32,10 +32,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include <memory>
-#include "CommGrid.h"
 #include "myenableif.h"
-#include "SpParHelper.h"
 
 namespace combblas {
 

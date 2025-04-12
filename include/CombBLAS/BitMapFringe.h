@@ -34,7 +34,6 @@
 // #include <algorithm>
 #include "BitMap.h"
 #include "CommGrid.h"
-#include "FullyDistSpVec.h"
 
 namespace combblas {
 
