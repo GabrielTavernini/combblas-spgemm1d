@@ -45,7 +45,6 @@
 // #include "CombBLAS.h"
 // #include "FullyDist.h"
 
-#include <fast_matrix_market/fast_matrix_market.hpp>
 #include <vector>
 
 namespace combblas {
@@ -2103,7 +2102,6 @@ void SpDCCols<IT, NT>::WriteMM(std::string filename, bool onebased)
     IT loccol = getncol();
     std::ofstream os(filename, std::ios_base::binary);
     // write option is not useful to change precision. Go to line 602, filed_conv.hpp to change it manually.
-    fast_matrix_market::write_matrix_market_triplet(os, {locrow, loccol}, rows, cols, vals);
 }
 
 

@@ -44,7 +44,6 @@
 #include "ParFriends.h"
 #include "Operations.h"
 #include "FileHeader.h"
-#include "fast_matrix_market/app/triplet.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -964,7 +963,6 @@ void SpParMat1D< IT,NT,DER >::SequentialWriteMM(const std::string filename, bool
     IT locrow = spSeq_->getnrow();
     IT loccol = spSeq_->getncol();
     std::ofstream os(filename, std::ios_base::binary);
-    fast_matrix_market::write_matrix_market_triplet(os, {locrow, loccol}, rows, cols, vals);
 }
 
 template <class IT, class NT, class DER>
@@ -974,7 +972,6 @@ void SpParMat1D< IT,NT,DER >::SequentialReadMM(const std::string filename, bool 
     vector<NT> vals;
     IT gnrows, gncols;
     std::ifstream os(filename, std::ios_base::binary);
-    fast_matrix_market::read_matrix_market_triplet(os, gnrows, gncols, rows, cols, vals);
 
     // calculate blocksizevec
     int myrank = grid1d_->GetRank();
