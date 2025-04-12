@@ -19,6 +19,10 @@ else()
   target_compile_features(CombBLAS PUBLIC cxx_return_type_deduction)
 endif()
 
+# fast matrix market support for sequential read/write
+add_subdirectory(fast_matrix_market_yuxi)
+target_link_libraries(CombBLAS PUBLIC fast_matrix_market::fast_matrix_market)
+
 # set include directories
 target_include_directories(CombBLAS PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_include_directories(CombBLAS PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/psort-1.0/include> $<INSTALL_INTERFACE:include>)
