@@ -42,17 +42,16 @@
 #ifdef _GCC_STDINT_H 	// for cray
 	#undef _GCC_STDINT_H // original stdint does #include_next<"/opt/gcc/4.5.2/snos/lib/gcc/x86_64-suse-linux/4.5.2/include/stdint-gcc.h">
 #endif
-// #include <stdint.h>
-// #include <inttypes.h>
+#include <stdint.h>
+#include <inttypes.h>
 
-// #include <cmath>
-// #include <limits.h>
-
-// #include "psort/psort.h"
-// #include "psort/psort_samplesort.h"
-// #include "psort/MersenneTwister.h"
-// #include "CommGrid.h"
-// #include <mpi.h>
+#include <cmath>
+#include <limits.h>
+#include "SequenceHeaps/knheap.C"
+#include "psort/psort.h"
+#include "psort/psort_samplesort.h"
+#include "psort/MersenneTwister.h"
+#include "CommGrid.h"
 
 extern int cblas_splits; // TODO: move this inside namespace
 
@@ -116,7 +115,6 @@ enum Dim
 Column,
 Row
 };
-
 
 
 // force 8-bytes alignment in heap allocated memory

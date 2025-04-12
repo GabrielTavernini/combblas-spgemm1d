@@ -28,7 +28,6 @@
 
 #include <numeric>
 #include "DenseParMat.h"
-#include "FullyDistVec.h"
 #include "MPIType.h"
 #include "Operations.h"
 

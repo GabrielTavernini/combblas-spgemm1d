@@ -1,8 +1,0 @@
-SET(TFOLDER ${CMAKE_CURRENT_SOURCE_DIR}/julia)
-set(PMTCxxWrapROOT "/global/homes/y/yuxihong/.julia/artifacts/b28969bfe0d4c551302f58ecbf5a91930aa66489")
-set(CHITUCxxWrapROOT "/home/hongy0a/.julia/artifacts/b28969bfe0d4c551302f58ecbf5a91930aa66489")
-set(CMAKE_PREFIX_PATH ${PMTCxxWrapROOT} ${CHITUCxxWrapROOT})
-find_package(JlCxx REQUIRED)
-add_library(juliawrapper SHARED ${TFOLDER}/wrapper.cpp)
-target_include_directories(juliawrapper PUBLIC ${JULIA_INCLUDE_DIRS} ${CxxWrapROOT}/include)
-target_link_libraries(juliawrapper PUBLIC JlCxx::cxxwrap_julia JlCxx::cxxwrap_julia_stl CombBLAS )

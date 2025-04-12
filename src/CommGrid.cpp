@@ -30,6 +30,8 @@
 #include "CombBLAS/CommGrid.h"
 #include "CombBLAS/SpDefs.h"
 
+using namespace std;
+
 namespace combblas {
 
 CommGrid::CommGrid(MPI_Comm world, int nrowproc, int ncolproc): grrows(nrowproc), grcols(ncolproc)
@@ -46,7 +48,7 @@ CommGrid::CommGrid(MPI_Comm world, int nrowproc, int ncolproc): grrows(nrowproc)
 
 		if(grcols * grrows != nproc)
 		{
-			std::cerr << "This version of the Combinatorial BLAS only works on a square logical processor grid" << std::endl;
+			cerr << "This version of the Combinatorial BLAS only works on a square logical processor grid" << endl;
 			MPI_Abort(MPI_COMM_WORLD,NOTSQUARE);
 		}
 	}
@@ -148,22 +150,22 @@ bool CommGrid::operator== (const CommGrid & rhs) const
 }	
 
 
-void CommGrid::OpenDebugFile(std::string prefix, std::ofstream & output) const 
+void CommGrid::OpenDebugFile(string prefix, ofstream & output) const 
 {
-	std::stringstream ss;
-	std::string rank;
+	stringstream ss;
+	string rank;
 	ss << myrank;
 	ss >> rank;
-	std::string ofilename = prefix;
+	string ofilename = prefix;
 	ofilename += rank;
-	output.open(ofilename.c_str(), std::ios_base::app );
+	output.open(ofilename.c_str(), ios_base::app );
 }
 
-std::shared_ptr<CommGrid> ProductGrid(CommGrid * gridA, CommGrid * gridB, int & innerdim, int & Aoffset, int & Boffset)
+shared_ptr<CommGrid> ProductGrid(CommGrid * gridA, CommGrid * gridB, int & innerdim, int & Aoffset, int & Boffset)
 {
     if(*gridA != *gridB)
     {
-        std::cout << "Grids don't confirm for multiplication" << std::endl;
+        cout << "Grids don't confirm for multiplication" << endl;
         MPI_Abort(MPI_COMM_WORLD,GRIDMISMATCH);
     }
     // AA: these parameters are kept for backward compatibility
@@ -174,7 +176,7 @@ std::shared_ptr<CommGrid> ProductGrid(CommGrid * gridA, CommGrid * gridB, int & 
 		
 	//MPI_Comm world = MPI_COMM_WORLD;
 	//return shared_ptr<CommGrid>( new CommGrid(world, gridA->grrows, gridB->grcols) );
-    return std::shared_ptr<CommGrid>( new CommGrid(*gridA) );
+    return shared_ptr<CommGrid>( new CommGrid(*gridA) );
 }
 
 

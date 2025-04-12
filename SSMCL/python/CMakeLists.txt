@@ -1,5 +1,0 @@
-find_package(pybind11 CONFIG REQUIRED)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-# cmake_policy(CMP0148)
-pybind11_add_module(pycombblas MODULE python/pywrapper.cpp)
-target_link_libraries(pycombblas PUBLIC CombBLAS)

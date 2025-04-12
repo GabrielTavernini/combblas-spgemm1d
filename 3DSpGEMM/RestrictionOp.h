@@ -95,7 +95,7 @@ struct MIS2verifySR // identical to Select2ndMinSR except for the printout in ad
     
     static T2 add(const T2 & arg1, const T2 & arg2)
     {
-        // std::cout << "This should have never been executed for MIS-2 to be correct" << std::endl;
+        std::cout << "This should have never been executed for MIS-2 to be correct" << std::endl;
         return std::min(arg1, arg2);
     }
     
@@ -194,7 +194,7 @@ FullyDistSpVec<IT, ONT> MIS2(SpParMat < IT, INT, DER> A)
 
 
 template <typename IT, typename NT>
-void RestrictionOp( CCGrid & CMG, SpDCCols<IT, NT> * localmat, SpDCCols<IT, NT> *& R, SpDCCols<IT, NT> *& RT, bool perm = true)
+void RestrictionOp( CCGrid & CMG, SpDCCols<IT, NT> * localmat, SpDCCols<IT, NT> *& R, SpDCCols<IT, NT> *& RT)
 {
     if(CMG.layer_grid == 0)
     {
@@ -207,7 +207,7 @@ void RestrictionOp( CCGrid & CMG, SpDCCols<IT, NT> * localmat, SpDCCols<IT, NT> 
         SpParMat < IT, bool, SpDCCols < IT, bool >> BT = B;
         BT.Transpose();
         B += BT;
-        // B.PrintInfo();
+        B.PrintInfo();
         
         
         FullyDistSpVec<IT,IT>mis2 = MIS2<IT>(B);
@@ -260,29 +260,30 @@ void RestrictionOp( CCGrid & CMG, SpDCCols<IT, NT> * localmat, SpDCCols<IT, NT> 
         // next, select nonempty columns
         FullyDistVec<IT, IT> cimis2 = mis2.FindInds([](IT x){return true;}); // nonzero columns
         Rop(ri,cimis2,true);
-        SpParHelper::Print("Rop final (before normalization)...\n");
+        SpParHelper::Print("Rop final (before normalization)... ");
         Rop.PrintInfo();
         
-        if(perm){
-            // permute for load balance
-            float balance_before = Rop.LoadImbalance();
-            FullyDistVec<IT, IT> perm_row(Rop.getcommgrid()); // permutation vector defined on layers
-            FullyDistVec<IT, IT> perm_col(Rop.getcommgrid()); // permutation vector defined on layers
-            
-            perm_row.iota(Rop.getnrow(), 0);   // don't permute rows because they represent the IDs of "fine" vertices
-            perm_col.iota(Rop.getncol(), 0);   // CAN permute columns because they define the IDs of new aggregates
-            perm_col.RandPerm();    // permuting columns for load balance
-            
-            Rop(perm_row, perm_col, true); // in place permute
-            float balance_after = Rop.LoadImbalance();
-            
-            std::ostringstream outs;
-            outs << "Load balance (before): " << balance_before << std::endl;
-            outs << "Load balance (after): " << balance_after << std::endl;
-            SpParHelper::Print(outs.str());
-        }
+        // permute for load balance
+        float balance_before = Rop.LoadImbalance();
+        FullyDistVec<IT, IT> perm_row(Rop.getcommgrid()); // permutation vector defined on layers
+        FullyDistVec<IT, IT> perm_col(Rop.getcommgrid()); // permutation vector defined on layers
+        
+        perm_row.iota(Rop.getnrow(), 0);   // don't permute rows because they represent the IDs of "fine" vertices
+        perm_col.iota(Rop.getncol(), 0);   // CAN permute columns because they define the IDs of new aggregates
+        perm_col.RandPerm();    // permuting columns for load balance
+        
+        Rop(perm_row, perm_col, true); // in place permute
+        float balance_after = Rop.LoadImbalance();
+        
+        std::ostringstream outs;
+        outs << "Load balance (before): " << balance_before << std::endl;
+        outs << "Load balance (after): " << balance_after << std::endl;
+        SpParHelper::Print(outs.str());
+        
+        
         SpParMat<IT,NT,SpDCCols<IT,NT>> RopT = Rop;
         RopT.Transpose();
+        
         R = new SpDCCols<IT,NT>(Rop.seq()); // deep copy
         RT = new SpDCCols<IT,NT>(RopT.seq()); // deep copy
         

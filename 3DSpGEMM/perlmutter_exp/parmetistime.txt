@@ -1,2 +1,0 @@
-dataset,nparts,node,time(s)
-nlpkkt200,64,4,1.9141

@@ -54,8 +54,8 @@ void Symmetricize(PARMAT & A)
 struct ParentType
 {
 public:
-    ParentType(){parent=-1; p = 0;};
-    ParentType(int64_t x){parent=(x); p = 0;};
+	ParentType(){parent=-1; p = 0;};
+	ParentType(int64_t x){parent=(x); p = 0;};
     friend ostream& operator<<(ostream& os, const ParentType & vertex ){os << "Parent=" << vertex.parent << " p=" << vertex.p; return os;};
     //private:
     int64_t parent;

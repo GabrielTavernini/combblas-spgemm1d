@@ -27,16 +27,7 @@
  */
 
 
-
-#include "WriteMCLClusters.h"
-#include "CombBLAS/CombBLAS.h"
-#include "CombBLAS/Operations.h"
-#include "CombBLAS/SpParMat.h"
-#include "CombBLAS/CommGrid1D.h"
-#include "CombBLAS/ParFriends.h"
-
 #include <mpi.h>
-#include <vector>
 
 // These macros should be defined before stdint.h is included
 #ifndef __STDC_CONSTANT_MACROS
@@ -54,8 +45,10 @@
 #include <sstream>  // Required for stringstreams
 #include <ctime>
 #include <cmath>
+#include "CombBLAS/CombBLAS.h"
 #include "CC.h"
-#include <functional>
+#include "WriteMCLClusters.h"
+
 using namespace std;
 using namespace combblas;
 
@@ -129,12 +122,7 @@ typedef struct
     //debugging
     bool show;
     
-    // SSMCL
-    int vertexweight;
-    int graphpartitioner;
     
-    string bsvec;
-    string distvec;
 }HipMCLParam;
 
 
@@ -142,7 +130,7 @@ void InitParam(HipMCLParam & param)
 {
     //Input/Output file
     param.ifilename = "";
-    param.isInputMM = true;
+    param.isInputMM = false;
     param.ofilename = "";
     param.base = 1;
     
@@ -164,8 +152,8 @@ void InitParam(HipMCLParam & param)
     param.preprune = false;
     
     //HipMCL optimization
-    param.layers = 1; // let's define -1 as 1D layout, just 
-    param.compute = 2; // 1 means hash-based computation, 2 means heap-based computation
+    param.layers = 1;
+    param.compute = 1; // 1 means hash-based computation, 2 means heap-based computation
     param.phases = 1;
     param.perProcessMem = 0;
     param.isDoublePrecision = true;
@@ -173,12 +161,6 @@ void InitParam(HipMCLParam & param)
     
     //debugging
     param.show = false;
-
-    //SSMCL
-    param.graphpartitioner = 0; // 0 no graphpartition 1 use graph partition
-    param.bsvec="";
-    param.distvec="";
-
 }
 
 void ShowParam(HipMCLParam & param)
@@ -317,15 +299,6 @@ void ProcessParam(int argc, char* argv[], HipMCLParam & param)
         else if (strcmp(argv[i],"--32bit-local-index")==0) {
             param.is64bInt = false;
         }
-        else if (strcmp(argv[i],"--graphpartitioner")==0) {
-            param.graphpartitioner = atoi(argv[i+1]);
-        }
-        else if (strcmp(argv[i],"--bsvec")==0) {
-            param.bsvec = string(argv[i+1]);
-        }
-        else if (strcmp(argv[i],"--distvec")==0) {
-            param.distvec = string(argv[i+1]);
-        }
     }
     
     if(param.ofilename=="") // construct output file name if it is not provided
@@ -422,29 +395,6 @@ void MakeColStochastic(SpParMat<IT,NT,DER> & A)
 }
 
 template <typename IT, typename NT, typename DER>
-void MakeColStochastic1D(SpParMat1D<IT,NT,DER> & A)
-{
-    DER * seqptrA = A.seqptr();
-    Dcsc<IT, NT> *dcscA = seqptrA->GetDCSC();
-    IT nzc = dcscA->nzc;
-    IT nz = dcscA->nz;
-    vector<NT> columns(nzc, 0);
-    #pragma omp simd
-    for(IT colidx=0; colidx < nzc; colidx++){
-        NT colsum = 0.0; 
-        // get column sum.
-        for(IT rowidx = dcscA->cp[colidx]; rowidx < dcscA->cp[colidx+1]; rowidx++){
-            colsum += dcscA->numx[rowidx];
-        }
-        if(colsum == 0.0) colsum = std::numeric_limits<NT>::max();
-        // div all elements in the column by the sum.
-        for(IT rowidx = dcscA->cp[colidx]; rowidx < dcscA->cp[colidx+1]; rowidx++){
-            dcscA->numx[rowidx] /= colsum;
-        }
-    }
-}
-
-template <typename IT, typename NT, typename DER>
 void MakeColStochastic3D(SpParMat3D<IT,NT,DER> & A3D)
 {
     //SpParMat<IT, NT, DER> * ALayer = A3D.GetLayerMat();
@@ -458,7 +408,7 @@ template <typename IT, typename NT, typename DER>
 NT Chaos(SpParMat<IT,NT,DER> & A)
 {
     // sums of squares of columns
-    FullyDistVec<IT, NT> colssqs = A.Reduce(Column, plus<NT>(), 0.0, std::bind(exponentiate(),std::placeholders::_1, 2));
+    FullyDistVec<IT, NT> colssqs = A.Reduce(Column, plus<NT>(), 0.0, bind2nd(exponentiate(), 2));
     // Matrix entries are non-negative, so max() can use zero as identity
     FullyDistVec<IT, NT> colmaxs = A.Reduce(Column, maximum<NT>(), 0.0);
     colmaxs -= colssqs;
@@ -471,26 +421,13 @@ NT Chaos(SpParMat<IT,NT,DER> & A)
 }
 
 template <typename IT, typename NT, typename DER>
-NT Chaos1D(SpParMat1D<IT,NT,DER> & A)
-{
-    FullyDistVec1D<IT, NT> colssqs = A.Reduce(Column, plus<NT>(), 0.0, std::bind(exponentiate(),std::placeholders::_1, 2));
-    FullyDistVec1D<IT, NT> colmaxs = A.Reduce(Column, maximum<NT>(), 0.0);
-    colmaxs -= colssqs;
-    FullyDistVec1D<IT, NT> nnzPerColumn = A.Reduce(Column, plus<NT>(), 0.0, [](NT val){return 1.0;});
-    for(IT i=0; i<colmaxs.arr_.size(); i++){
-        colmaxs.arr_[i] *= nnzPerColumn.arr_[i];
-    }
-    return colmaxs.Reduce(maximum<NT>(),0.0);
-}
-
-template <typename IT, typename NT, typename DER>
 NT Chaos3D(SpParMat3D<IT,NT,DER> & A3D)
 {
     //SpParMat<IT, NT, DER> * ALayer = A3D.GetLayerMat();
     std::shared_ptr< SpParMat<IT, NT, DER> > ALayer = A3D.GetLayerMat();
 
     // sums of squares of columns
-    FullyDistVec<IT, NT> colssqs = ALayer->Reduce(Column, plus<NT>(), 0.0, std::bind(exponentiate(),std::placeholders::_1, 2));
+    FullyDistVec<IT, NT> colssqs = ALayer->Reduce(Column, plus<NT>(), 0.0, bind2nd(exponentiate(), 2));
     // Matrix entries are non-negative, so max() can use zero as identity
     FullyDistVec<IT, NT> colmaxs = ALayer->Reduce(Column, maximum<NT>(), 0.0);
     colmaxs -= colssqs;
@@ -509,20 +446,7 @@ NT Chaos3D(SpParMat3D<IT,NT,DER> & A3D)
 template <typename IT, typename NT, typename DER>
 void Inflate(SpParMat<IT,NT,DER> & A, double power)
 {
-    A.Apply(std::bind(exponentiate(),std::placeholders::_1, power));
-}
-
-template <typename IT, typename NT, typename DER>
-void Inflate1D(SpParMat1D<IT,NT,DER> & A, double power)
-{
-    DER * seqptrA = A.seqptr();
-    Dcsc<IT, NT> *dcscA = seqptrA->GetDCSC();
-    IT nzc = dcscA->nzc;
-    IT nz = dcscA->nz;
-    #pragma omp simd 
-    for(IT i=0; i<nz; i++){
-        dcscA->numx[i] = exponentiate()(dcscA->numx[i], power);
-    }
+    A.Apply(bind2nd(exponentiate(), power));
 }
 
 template <typename IT, typename NT, typename DER>
@@ -530,7 +454,7 @@ void Inflate3D(SpParMat3D<IT,NT,DER> & A3D, double power)
 {
     //SpParMat<IT, NT, DER> * ALayer = A3D.GetLayerMat();
     std::shared_ptr< SpParMat<IT, NT, DER> > ALayer = A3D.GetLayerMat();
-    ALayer->Apply(std::bind(exponentiate(),std::placeholders::_1, power));
+    ALayer->Apply(bind2nd(exponentiate(), power));
 }
 
 // default adjustloop setting
@@ -554,7 +478,7 @@ void RemoveIsolated(SpParMat<IT,NT,DER> & A, HipMCLParam & param)
 {
     ostringstream outs;
     FullyDistVec<IT, NT> ColSums = A.Reduce(Column, plus<NT>(), 0.0);
-    FullyDistVec<IT, IT> nonisov = ColSums.FindInds(std::bind(greater<NT>(),std::placeholders::_1, 0));
+    FullyDistVec<IT, IT> nonisov = ColSums.FindInds(bind2nd(greater<NT>(), 0));
     IT numIsolated = A.getnrow() - nonisov.TotalLength();
     outs << "Number of isolated vertices: " << numIsolated << endl;
     SpParHelper::Print(outs.str());
@@ -622,79 +546,35 @@ FullyDistVec<IT, IT> HipMCL(SpParMat<IT,NT,DER> & A, HipMCLParam & param)
     {
         A.PrintInfo();
     }
-    int myrank, nprocs;
-    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    
 
     // chaos doesn't make sense for non-stochastic matrices
     // it is in the range {0,1} for stochastic matrices
     NT chaos = 1;
-    NT chaos1d = 1;
     int it=1;
     double tInflate = 0;
     double tExpand = 0;
-    double tSpGEMM = 0;
-    double tPrune = 0;
-    double tottime = 0;
     typedef PlusTimesSRing<NT, NT> PTFF;
-    SpParMat3D<IT,NT,DER> A3D_cs(1);
-    shared_ptr<CommGrid1D> grid1d;
-    grid1d.reset(new CommGrid1D(MPI_COMM_WORLD));
-    SpParMat1D<IT, NT, DER> A1D(grid1d);
-    FullyDistVec<IT, IT> cclabels;
-    MPI_Timer timer;
-    if(param.layers > 1) {
-        SpParMat<IT,NT,DER> A2D_cs = SpParMat<IT, NT, DER>(A);
-        A3D_cs = SpParMat3D<IT,NT,DER>(A2D_cs, param.layers, true, false);    // Non-special column split
-    }else if(param.layers == -1){
-        // do shuffle
-        vector<IT> blocksizevec;
-        if(param.graphpartitioner > 0){
-            if(param.bsvec == "" || param.distvec == ""){
-                if(myrank == 0) printf("input blocksizevec and distvec for SSMCL. \n");
-                exit(0);
-            }
-            FullyDistVec<IT, IT> permute;
-            string blocksizefile(param.bsvec);
-            blocksizevec = SpHelper::ReadIntegersFromFile(blocksizefile);
-            string distvecfile(param.distvec);
-            permute.ParallelRead(distvecfile, true, maximum<double>());
-            A(permute, permute, true);
-            A1D = SpParMat1D<IT, NT, DER>(A, blocksizevec, blocksizevec);
-            SpParHelper::Print("1D with graph partition input!\n");
-        }else{
-            SpParHelper::Print("1D but with origin input!\n");
-            A1D = SpParMat1D<IT, NT, DER>(A);
-        }
-        // A1D.StatisticInfo();
-    }
-    
+	SpParMat3D<IT,NT,DER> A3D_cs(param.layers);
+	if(param.layers > 1) {
+    	SpParMat<IT,NT,DER> A2D_cs = SpParMat<IT, NT, DER>(A);
+		A3D_cs = SpParMat3D<IT,NT,DER>(A2D_cs, param.layers, true, false);    // Non-special column split
+	}
     // while there is an epsilon improvement
     while( chaos > EPS)
     {
-        SpParMat3D<IT,NT,DER> A3D_rs(1);
-        if(param.layers > 1) {
-            A3D_rs  = SpParMat3D<IT,NT,DER>(A3D_cs, false); // Create new rowsplit copy of matrix from colsplit copy
-        }else if(param.layers == -1){
-            // nothing to do
-        }
+		SpParMat3D<IT,NT,DER> A3D_rs(param.layers);
+		if(param.layers > 1) {
+			A3D_rs  = SpParMat3D<IT,NT,DER>(A3D_cs, false); // Create new rowsplit copy of matrix from colsplit copy
+		}
 
-        tExpand = MPI_Wtime();
-
+        double t1 = MPI_Wtime();
         //A.Square<PTFF>() ;        // expand
-        if(param.layers == 1){
-            tSpGEMM = MPI_Wtime();
-            SpParMat<IT, NT, DER>Acopy(A);
-            A = Mult_AnXBn_Synch<PTFF, NT, DER>(A,Acopy);
-            tSpGEMM = MPI_Wtime() - tSpGEMM;
-            tPrune = MPI_Wtime();
-            MCLPruneRecoverySelect(A,(NT)param.prunelimit,
-            (IT)param.select,(IT)param.recover_num,
-            (NT)param.recover_pct,param.kselectVersion);
-            tPrune = MPI_Wtime() - tPrune;
-        }
-        else if(param.layers > 1){
-            A3D_cs = MemEfficientSpGEMM3D<PTFF, NT, DER, IT, NT, NT, DER, DER >(
+		if(param.layers == 1){
+			A = MemEfficientSpGEMM<PTFF, NT, DER>(A, A, param.phases, param.prunelimit, (IT)param.select, (IT)param.recover_num, param.recover_pct, param.kselectVersion, 1, param.perProcessMem);
+		}
+		else{
+			A3D_cs = MemEfficientSpGEMM3D<PTFF, NT, DER, IT, NT, NT, DER, DER >(
                 A3D_cs, A3D_rs, 
                 param.phases, 
                 param.prunelimit, 
@@ -702,95 +582,56 @@ FullyDistVec<IT, IT> HipMCL(SpParMat<IT,NT,DER> & A, HipMCLParam & param)
                 (IT)param.recover_num, 
                 param.recover_pct, 
                 param.kselectVersion,
-                param.compute,
+                1,
                 param.perProcessMem
-            );
-        }else if(param.layers == -1){
-            timer.start("spgemm1drdma");
-            tSpGEMM = MPI_Wtime();
-            SpParMat1D<IT, NT, DER>Acopy(A1D);
-            A1D.ParallelWriteMM("A1D_"+to_string(it) + ".mtx", true);
-            A1D = Mult_AnXBn_1D_CbC_RDMA_FetchAll<PTFF, NT, DER, IT, NT, NT, DER, DER>(A1D, Acopy);
-            // A1D = Mult_AnXBn_1D_BD<PTFF, NT, DER>(A1D, Acopy);
-            
-            tSpGEMM = MPI_Wtime() - tSpGEMM;
-            timer.stop("spgemm1drdma");
-            timer.start("convert22d");
-            SpParMat<IT,NT,DER> A2D(A1D, A1D.getblocksizevec());
-            timer.stop("convert22d");
-            timer.start("prunerecover");
-            tPrune = MPI_Wtime();
-            MCLPruneRecoverySelect(A2D,(NT)param.prunelimit,
-            (IT)param.select,(IT)param.recover_num,
-            (NT)param.recover_pct,param.kselectVersion);
-            tPrune = MPI_Wtime() - tPrune;
-            timer.stop("prunerecover");
-            timer.start("convert21d");
-            A1D = SpParMat1D<IT, NT, DER>(A2D, A1D.getblocksizevec(), A1D.getrowblocksizevec());
-            timer.stop("convert21d");
-        }
-
-        if(param.layers == 1){
-            MakeColStochastic(A);
-        }else if(param.layers > 1){
-            MakeColStochastic3D(A3D_cs);
-        }else if(param.layers == -1){
-            MakeColStochastic1D(A1D);
-        }
+         	);
+		}
         
-        tExpand += (MPI_Wtime() - tExpand);
+		if(param.layers == 1){
+			MakeColStochastic(A);
+		}
+		else{
+            MakeColStochastic3D(A3D_cs);
+		}
+        tExpand += (MPI_Wtime() - t1);
         
         if(param.show)
         {
             SpParHelper::Print("After expansion\n");
             A.PrintInfo();
         }
-        if(param.layers == 1){
-            chaos = Chaos(A);
-        }else if(param.layers > 1){
-            chaos = Chaos3D(A3D_cs);
-        }else if(param.layers == -1){
-            chaos = Chaos1D(A1D);
-        }
+        if(param.layers == 1) chaos = Chaos(A);
+        else chaos = Chaos3D(A3D_cs);
         
-        tInflate = MPI_Wtime();
+        double tInflate1 = MPI_Wtime();
+        if (param.layers == 1) Inflate(A, param.inflation);
+        else Inflate3D(A3D_cs, param.inflation);
 
-        if (param.layers == 1){
-            Inflate(A, param.inflation);
-        }else if(param.layers > 1){
-            Inflate3D(A3D_cs, param.inflation);
-        }else if(param.layers == -1){
-            Inflate1D(A1D, param.inflation);
-        }
-        
-        if(param.layers == 1){
-            MakeColStochastic(A);
-        }
-        else if(param.layers > 1){
-            MakeColStochastic3D(A3D_cs);
-        }else if(param.layers == -1){
-            // MakeColStochastic(A);
-            MakeColStochastic1D(A1D);
-        }
+        if(param.layers == 1) MakeColStochastic(A);
+        else MakeColStochastic3D(A3D_cs);
 
-        tInflate = MPI_Wtime() - tInflate;
+        tInflate += (MPI_Wtime() - tInflate1);
         
         if(param.show)
         {
             SpParHelper::Print("After inflation\n");
             A.PrintInfo();
         }
-        // double newbalance = A.LoadImbalance();
-        double ittime = tSpGEMM + tPrune + tInflate;
+        
+        
+        
+        double newbalance = A.LoadImbalance();
+        double t3=MPI_Wtime();
         stringstream s;
-        s << "Iteration# "  << setw(3) << it << " : "  << " chaos: " << 
-        setprecision(3) << chaos << " Time: " << ittime << endl;
+        s << "Iteration# "  << setw(3) << it << " : "  << " chaos: " << setprecision(3) << chaos << "  load-balance: "<< newbalance << " Time: " << (t3-t1) << endl;
         SpParHelper::Print(s.str());
         it++;
-        MPI_Barrier(MPI_COMM_WORLD);
-        tottime += ittime;
+        
+        
+        
     }
-    printf("total time to soluiton %f \n", tottime);
+    
+    
 #ifdef TIMING    
     double tcc1 = MPI_Wtime();
 #endif
@@ -800,20 +641,13 @@ FullyDistVec<IT, IT> HipMCL(SpParMat<IT,NT,DER> & A, HipMCLParam & param)
     // SpParMat<IT,NT,DER> A does not work because int64_t and float promote trait not defined
     // hence, we are forcing this with IT and double
     SpParMat<IT,double, SpDCCols < IT, double >> ADouble(MPI_COMM_WORLD);
-    if(param.layers == 1) {
-        ADouble = A;
-    }
-    else if(param.layers > 1){
-        ADouble = A3D_cs.Convert2D();
-    }else if(param.layers == -1){
-        ADouble = SpParMat<IT, NT, DER>(A1D, A1D.getblocksizevec());
-    }
-    return cclabels;
-    cclabels = Interpret(ADouble);
+    if(param.layers == 1) ADouble = A;
+    else ADouble = A3D_cs.Convert2D();
+    FullyDistVec<IT, IT> cclabels = Interpret(ADouble);
     
     
 #ifdef TIMING
-    double tcc = MPI_Wtime() - tcc1;
+    double tcc = MPI_Wtime() - tcc1;    
     int myrank;
     MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
     if(myrank==0)
@@ -833,7 +667,7 @@ FullyDistVec<IT, IT> HipMCL(SpParMat<IT,NT,DER> & A, HipMCLParam & param)
             cout << "File I/O: " << tIO << endl;
             cout << "=================================================" << endl;
         }
-        else if(param.layers > 1){
+        else{
             cout << "================detailed timing==================" << endl;
             cout << "Expansion: " << mcl3d_symbolictime + mcl3d_Abcasttime + mcl3d_Bbcasttime + mcl3d_localspgemmtime + mcl3d_SUMMAmergetime + mcl3d_reductiontime + mcl3d_3dmergetime << endl;
             cout << "       Symbolic=" << mcl3d_symbolictime << endl;
@@ -851,12 +685,14 @@ FullyDistVec<IT, IT> HipMCL(SpParMat<IT,NT,DER> & A, HipMCLParam & param)
             cout << "Component: " << tcc << endl;
             cout << "File I/O: " << tIO << endl;
             cout << "=================================================" << endl;
-        }else if(param.layers == -1){
-            
+        
         }
     }
     
 #endif
+    
+    return cclabels;
+
 
 }
 
@@ -869,8 +705,6 @@ void Symmetricize(SpParMat<IT,NT,DER> & A)
     {
         SpParHelper::Print("Symmatricizing an unsymmetric input matrix.\n");
         A += AT;
-    }else{
-        SpParHelper::Print("input matrix is symmetric.\n");
     }
 }
 
@@ -881,61 +715,74 @@ void MainBody(HipMCLParam & param)
     FullyDistVec<GIT, array<char, MAXVERTNAME> > vtxLabels(A.getcommgrid());
     
     // read file
-    SpParHelper::Print("Reading input file......\n");
-    double tIO = MPI_Wtime();
     
+    SpParHelper::Print("Reading input file......\n");
+    
+    double tIO1 = MPI_Wtime();
     if(param.isInputMM)
         A.ParallelReadMM(param.ifilename, param.base, maximum<NT>());    // if base=0, then it is implicitly converted to Boolean false
     else // default labeled triples format
         vtxLabels = A.ReadGeneralizedTuples(param.ifilename,  maximum<NT>());
-    tIO = MPI_Wtime() - tIO;
-    int myrank, nprocs;
-    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
     
-    if(myrank == 0) printf("time is %.3f seconds\n", tIO);
+    tIO = MPI_Wtime() - tIO1;
+    ostringstream outs;
+    outs << " : took " << tIO << " seconds" << endl;
+    SpParHelper::Print(outs.str());
     // Symmetricize the matrix only if needed
     Symmetricize(A);
-    double balance = A.LoadImbalance();
-
-//     outs.str("");
-//     outs.clear();
-//     GIT nnz = A.getnnz();
-//     GIT nv = A.getnrow();
-//     outs << "Number of vertices: " << nv << " number of edges: "<< nnz << endl;
-//     outs << "Load balance: " << balance << endl;
-//     SpParHelper::Print(outs.str());
-//     if(param.show)
-//     {
-//         A.PrintInfo();
-//     }
-
-// #ifdef TIMING
-//     mcl_Abcasttime = 0;
-//     mcl_Bbcasttime = 0;
-//     mcl_localspgemmtime = 0;
-//     mcl_multiwaymergetime = 0;
-//     mcl_kselecttime = 0;
-//     mcl_prunecolumntime = 0;
-// #endif
-
-//     double tstart = MPI_Wtime();
-//     // Run HipMCL
-    FullyDistVec<GIT, GIT> culstLabels = HipMCL(A, param);
-//     //culstLabels.ParallelWrite(param.ofilename, param.base); // clusters are always numbered 0-based
-//     if(param.isInputMM)
-//         WriteMCLClusters(param.ofilename, culstLabels, param.base);
-//     else
-//         WriteMCLClusters(param.ofilename, culstLabels, vtxLabels);
-
-//     GIT nclusters = culstLabels.Reduce(maximum<GIT>(), (GIT) 0 ) ;
-//     nclusters ++; // because of zero based indexing for clusters
     
-//     double tend = MPI_Wtime();
-//     stringstream s2;
-//     s2 << "Number of clusters: " << nclusters << endl;
-//     s2 << "Total time: " << (tend-tstart) << endl;
-//     s2 <<  "=================================================\n" << endl ;
-//     SpParHelper::Print(s2.str());
+    double balance = A.LoadImbalance();
+    
+    outs.str("");
+    outs.clear();
+    
+    GIT nnz = A.getnnz();
+    GIT nv = A.getnrow();
+    outs << "Number of vertices: " << nv << " number of edges: "<< nnz << endl;
+    
+    outs << "Load balance: " << balance << endl;
+    SpParHelper::Print(outs.str());
+    
+    if(param.show)
+    {
+        A.PrintInfo();
+    }
+    
+    
+    
+#ifdef TIMING
+    mcl_Abcasttime = 0;
+    mcl_Bbcasttime = 0;
+    mcl_localspgemmtime = 0;
+    mcl_multiwaymergetime = 0;
+    mcl_kselecttime = 0;
+    mcl_prunecolumntime = 0;
+#endif
+    
+    
+    
+    double tstart = MPI_Wtime();
+    
+    // Run HipMCL
+    FullyDistVec<GIT, GIT> culstLabels = HipMCL(A, param);
+    //culstLabels.ParallelWrite(param.ofilename, param.base); // clusters are always numbered 0-based
+    
+    if(param.isInputMM)
+        WriteMCLClusters(param.ofilename, culstLabels, param.base);
+    else
+        WriteMCLClusters(param.ofilename, culstLabels, vtxLabels);
+    
+    
+    
+    GIT nclusters = culstLabels.Reduce(maximum<GIT>(), (GIT) 0 ) ;
+    nclusters ++; // because of zero based indexing for clusters
+    
+    double tend = MPI_Wtime();
+    stringstream s2;
+    s2 << "Number of clusters: " << nclusters << endl;
+    s2 << "Total time: " << (tend-tstart) << endl;
+    s2 <<  "=================================================\n" << endl ;
+    SpParHelper::Print(s2.str());
     
 }
 
@@ -991,18 +838,17 @@ int main(int argc, char* argv[])
     }
     
     {
-        MainBody<int64_t, int64_t, double>(param);
-        // if(param.isDoublePrecision)
-        // {
-        //     if(param.is64bInt) // default case
-        //         MainBody<int64_t, int64_t, double>(param);
-        //     else
-        //         MainBody<int64_t, int32_t, double>(param);
-        // }
-        // else if(param.is64bInt)
-        //     MainBody<int64_t, int64_t, float>(param);
-        // else
-        //     MainBody<int64_t, int32_t, float>(param);
+        if(param.isDoublePrecision)
+        {
+            if(param.is64bInt) // default case
+                MainBody<int64_t, int64_t, double>(param);
+            else
+                MainBody<int64_t, int32_t, double>(param);
+        }
+        else if(param.is64bInt)
+            MainBody<int64_t, int64_t, float>(param);
+        else
+            MainBody<int64_t, int32_t, float>(param);
     }
     
     

@@ -53,8 +53,7 @@ struct equal_first
 
 
 template<typename T>
-struct myset
-// : public std::unary_function<T, T>
+struct myset: public std::unary_function<T, T>
 {
   myset(T myvalue): value(myvalue) {};
   /** @returns value regardless of x */
@@ -67,8 +66,7 @@ struct myset
 
 
 template<typename T>
-struct identity 
-// : public std::unary_function<T, T>
+struct identity : public std::unary_function<T, T>
 {
   /** @returns x itself */
   const T operator()(const T& x) const
@@ -80,8 +78,7 @@ struct identity
 
 // Because identify reports ambiguity in PGI compilers
 template<typename T>
-struct myidentity 
-// : public std::unary_function<T, T>
+struct myidentity : public std::unary_function<T, T>
 {
   /** @returns x itself */
   const T operator()(const T& x) const
@@ -92,8 +89,7 @@ struct myidentity
 
 
 template<typename T>
-struct totality 
-// : public std::unary_function<T, bool>
+struct totality : public std::unary_function<T, bool>
 {
   /** @returns true regardless */
   bool operator()(const T& x) const
@@ -104,8 +100,7 @@ struct totality
 	
 	
 template<typename T>
-struct safemultinv 
-// : public std::unary_function<T, T>
+struct safemultinv : public std::unary_function<T, T>
 {
   const T operator()(const T& x) const
   {
@@ -116,8 +111,7 @@ struct safemultinv
 
 
 template<typename T>
-struct sel2nd
-// : public std::binary_function<T, T, T>
+struct sel2nd: public std::binary_function<T, T, T>
 {
     const T& operator()(const T& x, const T & y) const
     {
@@ -126,8 +120,7 @@ struct sel2nd
 };
 
 template<typename T1, typename T2>
-struct bintotality 
-// : public std::binary_function<T1, T2, bool>
+struct bintotality : public std::binary_function<T1, T2, bool>
 {
   /** @returns true regardless */
   bool operator()(const T1& x, const T2 & y) const
@@ -144,8 +137,7 @@ struct bintotality
  * <double, int, double> , <double, double, double> , <float, float, float>
  * and C++ can automatically upcast each case to <double, double, double>
  */
-struct exponentiate 
-// : public std::binary_function<double, double, double> 
+struct exponentiate : public std::binary_function<double, double, double> 
 {
     double operator()(double x, double y) const { return std::pow(x, y); }
 };
@@ -159,8 +151,7 @@ struct exponentiate
  *  associated, built-in MPI data type, translates to @c MPI_MAX.
  */
 template<typename T>
-struct maximum 
-// : public std::binary_function<T, T, T>
+struct maximum : public std::binary_function<T, T, T>
 {
   /** @returns the maximum of x and y. */
   const T operator()(const T& x, const T& y) const
@@ -178,8 +169,7 @@ struct maximum
  *  associated, built-in MPI data type, translates to @c MPI_MIN.
  */
 template<typename T>
-struct minimum 
-// : public std::binary_function<T, T, T>
+struct minimum : public std::binary_function<T, T, T>
 {
   /** @returns the minimum of x and y. */
   const T operator()(const T& x, const T& y) const
@@ -192,8 +182,7 @@ struct minimum
  *  @brief With 50/50 chances, return a one of the operants
  */
 template<typename T>
-struct RandReduce 
-// : public std::binary_function<T, T, T>
+struct RandReduce : public std::binary_function<T, T, T>
 {
     /** @returns the minimum of x and y. */
     const T operator()(const T& x, const T& y) 
@@ -215,8 +204,7 @@ struct RandReduce
  *  @brief Returns a special value (passed to the constructor of the functor) when both operants disagree
  */
 template<typename T>
-struct SetIfNotEqual 
-// : public std::binary_function<T, T, T>
+struct SetIfNotEqual : public std::binary_function<T, T, T>
 {
     const T operator()(const T& x, const T& y)
     {
@@ -242,8 +230,7 @@ struct SetIfNotEqual
  *  associated, built-in MPI data type, translates to @c MPI_BAND.
  */
 template<typename T>
-struct bitwise_and 
-// : public std::binary_function<T, T, T>
+struct bitwise_and : public std::binary_function<T, T, T>
 {
   /** @returns @c x & y. */
   T operator()(const T& x, const T& y) const
@@ -261,8 +248,7 @@ struct bitwise_and
  *  associated, built-in MPI data type, translates to @c MPI_BOR.
  */
 template<typename T>
-struct bitwise_or 
-// : public std::binary_function<T, T, T>
+struct bitwise_or : public std::binary_function<T, T, T>
 {
   /** @returns the @c x | y. */
   T operator()(const T& x, const T& y) const
@@ -279,8 +265,7 @@ struct bitwise_or
  *  an associated, built-in MPI data type, translates to @c MPI_LXOR.
  */
 template<typename T>
-struct logical_xor 
-// : public std::binary_function<T, T, T>
+struct logical_xor : public std::binary_function<T, T, T>
 {
   /** @returns the logical exclusive OR of x and y. */
   T operator()(const T& x, const T& y) const
@@ -298,8 +283,7 @@ struct logical_xor
  *  MPI_BXOR.
  */
 template<typename T>
-struct bitwise_xor 
-// : public std::binary_function<T, T, T>
+struct bitwise_xor : public std::binary_function<T, T, T>
 {
   /** @returns @c x ^ y. */
   T operator()(const T& x, const T& y) const
@@ -307,8 +291,6 @@ struct bitwise_xor
     return x ^ y;
   }
 };
-
-
 
 }
 

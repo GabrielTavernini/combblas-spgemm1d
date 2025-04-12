@@ -1,13 +1,6 @@
 add_executable(mpipspgemm mpipspgemm.cpp)
 target_link_libraries(mpipspgemm CombBLAS)
+
 add_executable(test_mpipspgemm test_mpipspgemm.cpp)
 target_link_libraries(test_mpipspgemm CombBLAS)
-add_executable(Rop1d RestrictionOp1D.cpp)
-target_link_libraries(Rop1d CombBLAS)
-add_executable(Rop RestrictionOp.cpp)
-target_link_libraries(Rop CombBLAS)
-add_executable(backupbc BetwCentint_benchmark.cpp)
-target_link_libraries(backupbc CombBLAS)
 
-# add_executable(AAlarge AAlarge.cpp)
-# target_link_libraries(AAlarge CombBLAS)

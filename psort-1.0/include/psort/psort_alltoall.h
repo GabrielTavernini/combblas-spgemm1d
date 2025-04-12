@@ -24,7 +24,6 @@ THE SOFTWARE.
 #define PSORT_ALLTOALL_H
 
 #include "psort_util.h"
-#include <limits.h>
 
 namespace vpsort {  
   using namespace std;
@@ -80,11 +79,11 @@ namespace vpsort {
     for (int i=0; i<nproc; ++i) boundaries[i] = (_Distance) recv_disps[i];
     boundaries[nproc] = (_Distance) n_loc;  // for the merging  
 
-    delete [] recv_counts;
-    delete [] recv_disps;
-
-    delete [] send_counts;
-    delete [] send_disps;
+	delete [] recv_counts;
+	delete [] recv_disps;
+ 
+	delete [] send_counts;
+	delete [] send_disps;
     return;
   }
 

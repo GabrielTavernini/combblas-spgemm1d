@@ -136,9 +136,7 @@ SpDCCols<IT,NT> * ReduceAll_threaded(std::vector< SpTuples<IT,NT>* > & unreduced
 	typedef PlusTimesSRing<double, double> PTDD;
     IT mdim = unreducedC[0]->getnrow();
     IT ndim = unreducedC[0]->getncol();
-    int myrank;
-    // std::cerr << "mdim " << mdim << ", ndim " << ndim << std::endl;
-    // std::cerr <<"unreducedC m " << unreducedC[0]->getnrow() << ", n " << unreducedC[0]->getncol() << std::endl;
+    
     // ------ merge list of tuples from n/sqrt(p) stages of SUMMA -------
     double loc_beg1 = MPI_Wtime();
     //SpTuples<IT, NT>* localmerged = multiwayMerge(unreducedC, true);

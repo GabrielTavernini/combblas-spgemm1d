@@ -29,6 +29,7 @@
 
 #include "CombBLAS/MemoryPool.h"
 
+using namespace std;
 
 namespace combblas {
 
@@ -40,7 +41,7 @@ MemoryPool::MemoryPool(void * m_beg, size_t m_size):initbeg((char*)m_beg), inite
 
 void * MemoryPool::alloc(size_t size)
 {
-	for(std::list<Memory>::iterator iter = freelist.begin(); iter != freelist.end(); ++iter)
+	for(list<Memory>::iterator iter = freelist.begin(); iter != freelist.end(); ++iter)
 	{
     	if ((*iter).size > size)	// return the first 'big enough' chunk of memory
 		{
@@ -51,7 +52,7 @@ void * MemoryPool::alloc(size_t size)
 			return (void *) free;		// return the memory 
 		}
 	}
-	std::cout << "No pinned memory available" << std::endl;
+	cout << "No pinned memory available" << endl;
 	return NULL;
 }
 
@@ -60,8 +61,8 @@ void MemoryPool::dealloc(void * base, size_t size)
 {
 	if( ((char*) base) >= initbeg && (((char*)base) + size) < initend)
 	{	
-		std::list<Memory>::iterator titr = freelist.begin();	// trailing iterator
-		std::list<Memory>::iterator litr = freelist.begin();	// leading iterator
+		list<Memory>::iterator titr = freelist.begin();	// trailing iterator
+		list<Memory>::iterator litr = freelist.begin();	// leading iterator
 		++litr;
 		
 		if( (char*)base < titr->begaddr()) 	// if we're inserting to the front of the list
@@ -130,19 +131,19 @@ void MemoryPool::dealloc(void * base, size_t size)
 	}
 	else
 	{
-		std::cerr << "Memory starting at " << base << " and ending at " 
-		<< (void*) ((char*) base + size) << " is out of pool bounds, cannot dealloc()" << std::endl;
+		cerr << "Memory starting at " << base << " and ending at " 
+		<< (void*) ((char*) base + size) << " is out of pool bounds, cannot dealloc()" << endl;
 	}
 }
 
 //! Dump the contents of the pinned memory
-std::ofstream& operator<< (std::ofstream& outfile, const MemoryPool & mpool)
+ofstream& operator<< (ofstream& outfile, const MemoryPool & mpool)
 {
 	int i = 0;
-	for(std::list<Memory>::const_iterator iter = mpool.freelist.begin(); iter != mpool.freelist.end(); ++iter, ++i)
+	for(list<Memory>::const_iterator iter = mpool.freelist.begin(); iter != mpool.freelist.end(); ++iter, ++i)
 	{
 		outfile << "Chunk " << i << " of size: " << (*iter).size << " starts:" <<  (void*)(*iter).begin 
-			<< " and ends: " << (void*) ((*iter).begin + (*iter).size) << std::endl ; 
+			<< " and ends: " << (void*) ((*iter).begin + (*iter).size) << endl ; 
 	}
 	return outfile;
 }

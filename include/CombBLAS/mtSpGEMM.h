@@ -209,7 +209,6 @@ bool sort_less(const std::pair<IT, NT> &left, const std::pair<IT, NT> &right)
     return left.first < right.first;
 }
 
-
 // Hybrid approach of multithreaded HeapSpGEMM and HashSpGEMM
 template <typename SR, typename NTO, typename IT, typename NT1, typename NT2>
 SpTuples<IT, NTO> * LocalHybridSpGEMM
