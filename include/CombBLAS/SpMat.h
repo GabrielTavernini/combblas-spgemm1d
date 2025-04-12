@@ -32,18 +32,15 @@
 
 #include <iostream>
 #include <vector>
-#include <utility>
-#include "CombBLAS.h"
-#include "SpDefs.h"
 #include "promote.h"
 #include "LocArr.h"
+#include "FriendsSign.h"
 
 namespace combblas {
 
 // Forward declaration (required since a friend function returns a SpTuples object)
 template <class IU, class NU>	
 class SpTuples;
-
 
 /**
  ** The abstract base class for all derived sequential sparse matrix classes
@@ -173,9 +170,188 @@ protected:
 
 };
 
+
+
+template <class IT, class NT, class DER>
+SpMat<IT, NT, DER> SpMat<IT, NT, DER>::operator() (const std::vector<IT> & ri, const std::vector<IT> & ci) const
+{
+	if( (!ci.empty()) && (ci.back() > getncol()))
+	{
+		std::cerr << "Col indices out of bounds" << std::endl;
+		abort();
+	}
+	if( (!ri.empty()) && (ri.back() > getnrow()))
+	{
+		std::cerr << "Row indices out of bounds" << std::endl;
+		abort();
+	}
+
+	return ((static_cast<DER>(*this)) (ri, ci));
 }
 
-#include "SpMat.cpp"
+template <class IT, class NT, class DER>
+bool SpMat<IT, NT, DER>::operator== (const SpMat<IT, NT, DER> & rhs) const
+{
+	return ((static_cast<DER &>(*this)) == (static_cast<DER &>(rhs)) );
+}
+
+template <class IT, class NT, class DER>
+void SpMat<IT, NT, DER>::Split( SpMat< IT,NT,DER > & partA, SpMat< IT,NT,DER > & partB) 
+{
+	static_cast< DER* >(this)->Split(static_cast< DER & >(partA), static_cast< DER & >(partB));
+}
+
+template <class IT, class NT, class DER>
+void SpMat<IT, NT, DER>::Merge( SpMat< IT,NT,DER > & partA, SpMat< IT,NT,DER > & partB)
+{
+	static_cast< DER* >(this)->Merge(static_cast< DER & >(partA), static_cast< DER & >(partB));
+}
+
+
+template <class IT, class NT, class DER>
+template <typename SR>
+void SpMat<IT, NT, DER>::SpGEMM(SpMat<IT, NT, DER> & A, 
+			SpMat<IT, NT, DER> & B, bool isAT, bool isBT)
+{
+	IT A_m, A_n, B_m, B_n;
+ 
+	if(isAT)
+	{
+		A_m = A.getncol();
+		A_n = A.getnrow();
+	}
+	else
+	{
+		A_m = A.getnrow();
+		A_n = A.getncol();
+	}
+	if(isBT)
+	{
+		B_m = B.getncol();
+		B_n = B.getnrow();
+	}
+	else
+	{
+		B_m = B.getnrow();
+		B_n = B.getncol();
+	}
+		
+        if(getnrow() == A_m && getncol() == B_n)                
+        {
+               	if(A_n == B_m)
+               	{
+			if(isAT && isBT)
+			{
+				static_cast< DER* >(this)->template PlusEq_AtXBt< SR >(static_cast< DER & >(A), static_cast< DER & >(B));
+			}
+			else if(isAT && (!isBT))
+			{
+				static_cast< DER* >(this)->template PlusEq_AtXBn< SR >(static_cast< DER & >(A), static_cast< DER & >(B));
+			}
+			else if((!isAT) && isBT)
+			{
+				static_cast< DER* >(this)->template PlusEq_AnXBt< SR >(static_cast< DER & >(A), static_cast< DER & >(B));
+			}
+			else
+			{
+				static_cast< DER* >(this)->template PlusEq_AnXBn< SR >(static_cast< DER & >(A), static_cast< DER & >(B));
+			}				
+		}
+                else
+                {
+                       	std::cerr <<"Not multipliable: " << A_n << "!=" << B_m << std::endl;
+                }
+        }
+        else
+        {
+		std::cerr<< "Not addable: "<< getnrow() << "!=" << A_m << " or " << getncol() << "!=" << B_n << std::endl;
+        }
+};
+
+
+template<typename SR, typename NUO, typename IU, typename NU1, typename NU2, typename DER1, typename DER2>
+SpTuples<IU, NUO> * MultiplyReturnTuples
+					(const SpMat<IU, NU1, DER1> & A, 
+					 const SpMat<IU, NU2, DER2> & B, 
+					 bool isAT, bool isBT,
+					bool clearA = false, bool clearB = false)
+
+{
+	IU A_n, B_m;
+ 
+	if(isAT)
+	{
+		A_n = A.getnrow();
+	}
+	else
+	{
+		A_n = A.getncol();
+	}
+	if(isBT)
+	{
+		B_m = B.getncol();
+	}
+	else
+	{
+		B_m = B.getnrow();
+	}
+		
+    if(A_n == B_m)
+	{
+		if(isAT && isBT)
+		{
+			return Tuples_AtXBt<SR, NUO>(static_cast< const DER1 & >(A), static_cast< const DER2 & >(B), clearA, clearB);
+		}
+		else if(isAT && (!isBT))
+		{
+			return Tuples_AtXBn<SR, NUO>(static_cast< const DER1 & >(A), static_cast< const DER2 & >(B), clearA, clearB);
+		}
+		else if((!isAT) && isBT)
+		{
+			return Tuples_AnXBt<SR, NUO>(static_cast< const DER1 & >(A), static_cast< const DER2 & >(B), clearA, clearB);
+		}
+		else
+		{
+			return Tuples_AnXBn<SR, NUO>(static_cast< const DER1 & >(A), static_cast< const DER2 & >(B), clearA, clearB);
+		}				
+	}
+	else
+	{
+		std::cerr <<"Not multipliable: " << A_n << "!=" << B_m << std::endl;
+		return new SpTuples<IU, NUO> (0, 0, 0);
+	}
+}
+
+template <class IT, class NT, class DER>
+inline std::ofstream& SpMat<IT, NT, DER>::put(std::ofstream& outfile) const
+{
+	return static_cast<const DER*>(this)->put(outfile);
+}
+
+template <class IT, class NT, class DER>
+inline std::ifstream& SpMat<IT, NT, DER>::get(std::ifstream& infile)
+{
+	std::cout << "Getting... SpMat" << std::endl;
+	return static_cast<DER*>(this)->get(infile);
+}
+
+
+template < typename UIT, typename UNT, typename UDER >
+std::ofstream& operator<<(std::ofstream& outfile, const SpMat< UIT,UNT,UDER > & s)
+{
+	return s.put(outfile);
+}
+
+template < typename UIT, typename UNT, typename UDER >
+std::ifstream& operator>> (std::ifstream& infile, SpMat< UIT,UNT,UDER > & s)
+{
+	return s.get(infile);
+}
+
+
+}
+
+// #include "SpMat.cpp"
 
 #endif
 

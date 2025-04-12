@@ -43,7 +43,7 @@ struct MMmul
 	MMmul(const BT & smm1, const BT & smm2): sm1(smm1), sm2(smm2) { }
 
 	// No need for operator BT() because we have the corresponding copy constructor 
-        // and assignment operators to evaluate and return result !
+    // and assignment operators to evaluate and return result !
 
 };
 

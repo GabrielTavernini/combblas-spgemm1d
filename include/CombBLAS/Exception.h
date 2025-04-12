@@ -36,10 +36,10 @@ namespace combblas {
 
 class outofrangeexception: public std::exception
 {
-  virtual const char* what() const throw()
-  {
-    return "Index out of range exception";
-  }
+    virtual const char* what() const throw()
+    {
+        return "Index out of range exception";
+    }
 };
 
 }

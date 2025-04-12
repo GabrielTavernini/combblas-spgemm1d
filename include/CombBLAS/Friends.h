@@ -30,6 +30,7 @@
 #ifndef _FRIENDS_H_
 #define _FRIENDS_H_
 
+#include <functional>
 #include <iostream>
 #include "SpMat.h"	// Best to include the base class first
 #include "SpHelper.h"
@@ -39,8 +40,11 @@
 #include "SpImpl.h"
 #include "SpParHelper.h"
 #include "Compare.h"
-#include "CombBLAS.h"
+// #include "CombBLAS.h"
 #include "PreAllocatedSPA.h"
+#include <functional>
+
+#include "FriendsSign.h"
 
 namespace combblas {
 
@@ -264,9 +268,9 @@ int generic_gespmv_threaded (const SpMat<IU,NUM,DER> & A, const int32_t * indx, 
 					// else set sdispls[0] to zero (already done)
 					if(beg_rec == end_recs[i])	// fast case
 					{
-						std::transform(indy[i].begin(), indy[i].end(), indy[i].begin(), std::bind2nd(std::minus<int32_t>(), perproc*beg_rec));
-            std::copy(indy[i].begin(), indy[i].end(), sendindbuf+accum[i]);
-            std::copy(numy[i].begin(), numy[i].end(), sendnumbuf+accum[i]);
+						std::transform(indy[i].begin(), indy[i].end(), indy[i].begin(), std::bind(std::minus<int32_t>(),std::placeholders::_1, perproc*beg_rec));
+                        std::copy(indy[i].begin(), indy[i].end(), sendindbuf+accum[i]);
+                        std::copy(numy[i].begin(), numy[i].end(), sendnumbuf+accum[i]);
 					}
 					else	// slow case
 					{
@@ -397,7 +401,7 @@ void generic_gespmv_threaded_setbuffers (const SpMat<IU,NUM,DER> & A, const int3
 						
 					if(beg_rec == end_recs[i])	// fast case
 					{
-            std::transform(indy[i].begin(), indy[i].end(), indy[i].begin(), std::bind2nd(std::minus<int32_t>(), perproc*beg_rec));
+            std::transform(indy[i].begin(), indy[i].end(), indy[i].begin(), std::bind(std::minus<int32_t>(),std::placeholders::_1, perproc*beg_rec));
             std::copy(indy[i].begin(), indy[i].end(), sendindbuf + dspls[beg_rec] + alreadysent);
             std::copy(numy[i].begin(), numy[i].end(), sendnumbuf + dspls[beg_rec] + alreadysent);
 					}
@@ -565,7 +569,7 @@ template<class SR, class NUO, class IU, class NU1, class NU2>
 SpTuples<IU, NUO> * Tuples_AnXBt 
 					(const SpDCCols<IU, NU1> & A, 
 					 const SpDCCols<IU, NU2> & B,
-					bool clearA = false, bool clearB = false)
+					bool clearA, bool clearB)
 {
 	IU mdim = A.m;	
 	IU ndim = B.m;	// B is already transposed
@@ -608,7 +612,7 @@ template<class SR, class NUO, class IU, class NU1, class NU2>
 SpTuples<IU, NUO> * Tuples_AnXBn 
 					(const SpDCCols<IU, NU1> & A, 
 					 const SpDCCols<IU, NU2> & B,
-					bool clearA = false, bool clearB = false)
+					bool clearA, bool clearB)
 {
 	IU mdim = A.m;	
 	IU ndim = B.n;	
@@ -632,7 +636,7 @@ template<class SR, class NUO, class IU, class NU1, class NU2>
 SpTuples<IU, NUO> * Tuples_AtXBt 
 					(const SpDCCols<IU, NU1> & A, 
 					 const SpDCCols<IU, NU2> & B, 
-					bool clearA = false, bool clearB = false)
+					bool clearA, bool clearB)
 {
 	IU mdim = A.n;	
 	IU ndim = B.m;	
@@ -645,7 +649,7 @@ template<class SR, class NUO, class IU, class NU1, class NU2>
 SpTuples<IU, NUO> * Tuples_AtXBn 
 					(const SpDCCols<IU, NU1> & A, 
 					 const SpDCCols<IU, NU2> & B,
-					bool clearA = false, bool clearB = false)
+					bool clearA , bool clearB )
 {
 	IU mdim = A.n;	
 	IU ndim = B.n;	
@@ -657,7 +661,7 @@ SpTuples<IU, NUO> * Tuples_AtXBn
 // Performs a balanced merge of the array of SpTuples
 // Assumes the input parameters are already column sorted
 template<class SR, class IU, class NU>
-SpTuples<IU,NU> MergeAll( const std::vector<SpTuples<IU,NU> *> & ArrSpTups, IU mstar = 0, IU nstar = 0, bool delarrs = false )
+SpTuples<IU,NU> MergeAll( const std::vector<SpTuples<IU,NU> *> & ArrSpTups, IU mstar, IU nstar, bool delarrs )
 {
 	int hsize =  ArrSpTups.size();		
 	if(hsize == 0)
@@ -690,14 +694,14 @@ SpTuples<IU,NU> MergeAll( const std::vector<SpTuples<IU,NU> *> & ArrSpTups, IU m
 			estnnz += ArrSpTups[i]->getnnz();
 			heap[i] = std::make_tuple(std::get<0>(ArrSpTups[i]->tuples[0]), std::get<1>(ArrSpTups[i]->tuples[0]), i);
 		}	
-    std::make_heap(heap, heap+hsize, std::not2(heapcomp));
+    std::make_heap(heap, heap+hsize, std::not_fn(heapcomp));
 
 		std::tuple<IU, IU, NU> * ntuples = new std::tuple<IU,IU,NU>[estnnz]; 
 		IU cnz = 0;
 
 		while(hsize > 0)
 		{
-      std::pop_heap(heap, heap + hsize, std::not2(heapcomp));         // result is stored in heap[hsize-1]
+            std::pop_heap(heap, heap + hsize, std::not_fn(heapcomp));         // result is stored in heap[hsize-1]
 			int source = std::get<2>(heap[hsize-1]);
 
 			if( (cnz != 0) && 
@@ -714,7 +718,7 @@ SpTuples<IU,NU> MergeAll( const std::vector<SpTuples<IU,NU> *> & ArrSpTups, IU m
 			{
 				heap[hsize-1] = std::make_tuple(std::get<0>(ArrSpTups[source]->tuples[curptr[source]]), 
 								std::get<1>(ArrSpTups[source]->tuples[curptr[source]]), source);
-        std::push_heap(heap, heap+hsize, std::not2(heapcomp));
+        std::push_heap(heap, heap+hsize, std::not_fn(heapcomp));
 			}
 			else
 			{

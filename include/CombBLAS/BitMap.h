@@ -30,7 +30,9 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
-#include <stdint.h>
+#include <cstddef>
+#include <algorithm>
+#include <iostream>
 
 #define WORD_OFFSET(n) (n/64)
 #define BIT_OFFSET(n) (n & 0x3f)
