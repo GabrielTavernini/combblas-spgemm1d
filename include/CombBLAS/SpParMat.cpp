@@ -38,6 +38,8 @@
 #include "Operations.h"
 #include "FileHeader.h"
 #include "SpTuples.h"
+#include "fast_matrix_market/app/triplet.hpp"
+#include "fast_matrix_market/types.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -60,6 +62,7 @@ extern "C" {
 #include <set>
 #include <stdexcept>
 #include <iomanip>
+#include <fast_matrix_market/fast_matrix_market.hpp>
 #include "ParFriends.h"
 
 namespace combblas {
@@ -4439,12 +4442,14 @@ void SpParMat< IT,NT,DER >::ParallelReadMM (const std::string & filename, bool o
 
     template <class IT, class NT, class DER>
     void SpParMat< IT,NT,DER >::SequentialWriteMM(const std::string filename, bool onebased){
+        fast_matrix_market::write_options options;
         // options.precision = 10;
         int numThreads;
         #pragma omp parallel
         {
             numThreads = omp_get_num_threads();
         }
+        options.num_threads = numThreads;
         std::ofstream os(filename, std::ios_base::binary );
         os.setf(std::ios::fixed);
         os.precision(5);
@@ -4462,6 +4467,7 @@ void SpParMat< IT,NT,DER >::ParallelReadMM (const std::string & filename, bool o
             colsvec.push_back(sptuples.colindex(i)+addvalue);
             valuesvec.push_back(sptuples.numvalue(i));
         }
+        fast_matrix_market::write_matrix_market_triplet(os, {nrows,ncols}, rowsvec, colsvec, valuesvec);
     }
 
 
