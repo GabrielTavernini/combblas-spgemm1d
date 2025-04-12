@@ -32,7 +32,7 @@
 
 #include <iostream>
 #include <list>
-#include <new>			// For "placement new" (classes using this memory pool may need it)
+#include <new> // For "placement new" (classes using this memory pool may need it)
 #include <fstream>
 
 namespace combblas {

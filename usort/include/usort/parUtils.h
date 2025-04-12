@@ -22,8 +22,8 @@
 
 #ifdef __USE_64_BIT_INT__
 #define DendroIntL long long
-#define DendroIntLSpecifier %lld
-#define DendroUIntLSpecifier %llu
+#define DendroIntLSpecifier %ld
+#define DendroUIntLSpecifier %lu
 #else
 #define DendroIntL int
 #define DendroIntLSpecifier %d

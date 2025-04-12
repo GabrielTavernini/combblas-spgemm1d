@@ -1,0 +1,67 @@
+commands: 
+
+make -j && srun -n ${mpisize} -c ${openmpsize} --cpu-bind=cores ./Applications/betwcent_backup 20 32768 bcout.txt ER 20 100 1 1D
+
+
+####### without transpose #######
+Started Generation of scale 20
+Using 64 MPI processes
+Generated renamed edge lists
+Warning: Using smaller indices for the matrix than DistEdgeList
+Local matrices are 131072-by-131072
+As a whole: 1048576 rows and 1048576 columns and 209694668 nonzeros and 1677.56 MB.
+the graph is symmetric!!
+Batch processing will occur 32 times, each processing 32768 vertices (overall)
+Candidates chosen, precomputation finished
+fringe size nrow 1048576 ncol 32768 nnz 4696
+Exploring via BFS...
+Timer|Info: SpGEMM2D|Time: 0.673924
+Timer|Info: SpGEMM1D|Time: 0.049931
+1d exploring is correct!
+Timer|Info: SpGEMM2D|Time: 0.625149
+Timer|Info: SpGEMM1D|Time: 2.013179
+1d exploring is correct!
+Timer|Info: SpGEMM2D|Time: 0.979620
+Timer|Info: SpGEMM1D|Time: 3.579059
+1d exploring is correct!
+Timer|Info: SpGEMM2D|Time: 0.323637
+Timer|Info: SpGEMM1D|Time: 0.123364
+1d exploring is correct!
+loopcnt is 4 bfs size is 4
+
+####### with transpose #######
+Started Generation of scale 20
+Using 64 MPI processes
+Generated renamed edge lists
+Warning: Using smaller indices for the matrix than DistEdgeList
+Local matrices are 131072-by-131072
+As a whole: 1048576 rows and 1048576 columns and 209694711 nonzeros and 1677.56 MB.
+the graph is symmetric!!
+Batch processing will occur 32 times, each processing 32768 vertices (overall)
+Candidates chosen, precomputation finished
+fringe size nrow 1048576 ncol 32768 nnz 4780
+Exploring via BFS...
+Timer|Info: SpGEMM2D|Time: 0.591025
+Timer|Info: transposefringe|Time: 0.000213
+Timer|Info: SpGEMM1D_Transimpl|Time: 0.025046
+Timer|Info: transpose1dres|Time: 0.000937
+1d is correct!
+Timer|Info: SpGEMM2D|Time: 0.631024
+Timer|Info: transposefringe|Time: 0.000839
+Timer|Info: SpGEMM1D_Transimpl|Time: 0.085917
+Timer|Info: transpose1dres|Time: 0.014469
+1d is correct!
+Timer|Info: SpGEMM2D|Time: 1.004194
+Timer|Info: transposefringe|Time: 0.014529
+Timer|Info: SpGEMM1D_Transimpl|Time: 0.480163
+Timer|Info: transpose1dres|Time: 0.015385
+1d is correct!
+Timer|Info: SpGEMM2D|Time: 0.577883
+Timer|Info: transposefringe|Time: 0.000931
+Timer|Info: SpGEMM1D_Transimpl|Time: 0.055822
+Timer|Info: transpose1dres|Time: 0.007600
+1d is correct!
+loopcnt is 4 bfs size is 4
+
+
+

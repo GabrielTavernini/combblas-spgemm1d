@@ -30,8 +30,8 @@
 #include <iostream>
 #include <mpi.h>
 #include "CombBLAS/MPIType.h"
+#include "SpDefs.h"
 
-using namespace std;
 
 namespace combblas {
 
@@ -83,7 +83,7 @@ template<> MPI_Datatype MPIType< long double >( void )
 }; 
 template<> MPI_Datatype MPIType< bool >( void )
 {
-	return MPI_BYTE;  // usually  #define MPI_BOOL MPI_BYTE anyway
+	return MPI_CXX_BOOL;  // usually  #define MPI_BOOL MPI_BYTE anyway
 };
 
 }

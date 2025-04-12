@@ -30,10 +30,12 @@
 #ifndef _SEMIRINGS_H_
 #define _SEMIRINGS_H_
 
-#include <utility>
-#include <climits>
-#include <cmath>
+// #include <utility>
+// #include <climits>
+// #include <cmath>
+#include <iostream>
 #include "promote.h"
+#include "MPIOp.h"
 
 namespace combblas {
 

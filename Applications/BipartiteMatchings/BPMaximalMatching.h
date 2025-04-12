@@ -175,7 +175,7 @@ void MaximalMatching(Par_DCSC_Bool & A, Par_DCSC_Bool & AT, FullyDistVec<IT, IT>
 #ifdef DETAIL_STATS
         if(myrank == 0)
         {
-            printf("%3d %10lld %10lld %10lld %18lf\n", iteration , curUnmatchedRow, curUnmatchedCol, newlyMatched, times.back());
+            printf("%3d %10ld %10ld %10ld %18lf\n", iteration , curUnmatchedRow, curUnmatchedCol, newlyMatched, times.back());
         }
 #endif
         curUnmatchedCol = unmatchedCol.getnnz();
@@ -224,7 +224,7 @@ void MaximalMatching(Par_DCSC_Bool & A, Par_DCSC_Bool & AT, FullyDistVec<IT, IT>
         else if(type == KARP_SIPSER) std::cout << "Karp-Sipser";
         if(rand && (type == KARP_SIPSER || type == GREEDY) ) std::cout << "-rand";
         std::cout << " ";
-        printf("%lld    %lld     %lf\n", curUnmatchedRow, cardinality, totalTimes.back());
+        printf("%ld    %ld     %lf\n", curUnmatchedRow, cardinality, totalTimes.back());
         std::cout << "-------------------------------------------------------\n\n";
     }
     //isMatching(mateCol2Row, mateRow2Col);
@@ -346,7 +346,7 @@ void WeightedGreedy(Par_MAT_Double & A, FullyDistVec<IT, IT>& mateRow2Col,
 #ifdef DETAIL_STATS
 		if(myrank == 0)
 		{
-			printf("%3d %10lld %10lld %10lld %18lf\n", iteration , curUnmatchedRow, curUnmatchedCol, newlyMatched, times.back());
+			printf("%3d %10ld %10ld %10ld %18lf\n", iteration , curUnmatchedRow, curUnmatchedCol, newlyMatched, times.back());
 		}
 #endif
 		curUnmatchedCol = unmatchedCol.getnnz();
@@ -390,7 +390,7 @@ void WeightedGreedy(Par_MAT_Double & A, FullyDistVec<IT, IT>& mateRow2Col,
 #ifdef TIMING
 		std::cout << "****** maximal matching runtime ********\n";
 		std::cout << "Unmatched-Rows  Cardinality Total Time***\n";
-		printf("%lld    %lld     %lf\n", curUnmatchedRow, cardinality, totalTimes.back());
+		printf("%ld    %ld     %lf\n", curUnmatchedRow, cardinality, totalTimes.back());
 		std::cout << "-------------------------------------------------------\n\n";
 #endif
 	}

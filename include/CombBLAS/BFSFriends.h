@@ -30,6 +30,7 @@
 #define _BFS_FRIENDS_H_
 
 #include "mpi.h"
+#include <functional>
 #include <iostream>
 #include "SpParMat.h"	
 #include "SpParHelper.h"
@@ -57,121 +58,121 @@ class SpParMat;
  */
 template <typename IT, typename VT>
 void dcsc_gespmv_threaded_setbuffers (const SpDCCols<IT, bool> & A, const int32_t * indx, const VT * numx, int32_t nnzx, 
-				 int32_t * sendindbuf, VT * sendnumbuf, int * cnts, int * dspls, int p_c)
+    int32_t * sendindbuf, VT * sendnumbuf, int * cnts, int * dspls, int p_c)
 {
     Select2ndSRing<bool, VT, VT> BFSsring;
-	if(A.getnnz() > 0 && nnzx > 0)
-	{
-		int splits = A.getnsplit();
-		if(splits > 0)
-		{
-			std::vector< std::vector<int32_t> > indy(splits);
-			std::vector< std::vector< VT > > numy(splits);
-			int32_t nlocrows = static_cast<int32_t>(A.getnrow());
-			int32_t perpiece = nlocrows / splits;
-			
-			#ifdef _OPENMP
-			#pragma omp parallel for 
-			#endif
-			for(int i=0; i<splits; ++i)
-			{
-				if(i != splits-1)
-					SpMXSpV_ForThreading<BFSsring>(*(A.GetDCSC(i)), perpiece, indx, numx, nnzx, indy[i], numy[i], i*perpiece);
-				else
-					SpMXSpV_ForThreading<BFSsring>(*(A.GetDCSC(i)), nlocrows - perpiece*i, indx, numx, nnzx, indy[i], numy[i], i*perpiece);
-			}
-			
-			int32_t perproc = nlocrows / p_c;	
-			int32_t last_rec = p_c-1;
-			
-			// keep recipients of last entries in each split (-1 for an empty split)
-			// so that we can delete indy[] and numy[] contents as soon as they are processed		
-			std::vector<int32_t> end_recs(splits);
-			for(int i=0; i<splits; ++i)
-			{
-				if(indy[i].empty())
-					end_recs[i] = -1;
-				else
-					end_recs[i] = std::min(indy[i].back() / perproc, last_rec);
-			}
-			
-			int ** loc_rec_cnts = new int *[splits];	
-			#ifdef _OPENMP	
-			#pragma omp parallel for
-			#endif	
-			for(int i=0; i<splits; ++i)
-			{
-				loc_rec_cnts[i]  = new int[p_c](); // thread-local recipient data
-				if(!indy[i].empty())	// guarantee that .begin() and .end() are not null
-				{
-					int32_t cur_rec = std::min( indy[i].front() / perproc, last_rec);
-					int32_t lastdata = (cur_rec+1) * perproc;  // one past last entry that goes to this current recipient
-					for(typename std::vector<int32_t>::iterator it = indy[i].begin(); it != indy[i].end(); ++it)
-					{
-						if( ( (*it) >= lastdata ) && cur_rec != last_rec)	
-						{
-							cur_rec = std::min( (*it) / perproc, last_rec);	
-							lastdata = (cur_rec+1) * perproc;
-						}
-						++loc_rec_cnts[i][cur_rec];
-					}
-				}
-			}
-			#ifdef _OPENMP	
-			#pragma omp parallel for 
-			#endif
-			for(int i=0; i<splits; ++i)
-			{
-				if(!indy[i].empty())	// guarantee that .begin() and .end() are not null
-				{
-					// FACT: Data is sorted, so if the recipient of begin is the same as the owner of end, 
-					// then the whole data is sent to the same processor
-					int32_t beg_rec = std::min( indy[i].front() / perproc, last_rec); 
-					int32_t alreadysent = 0;	// already sent per recipient 
-					for(int before = i-1; before >= 0; before--)
-						 alreadysent += loc_rec_cnts[before][beg_rec];
-						
-					if(beg_rec == end_recs[i])	// fast case
-					{
-            std::transform(indy[i].begin(), indy[i].end(), indy[i].begin(), std::bind2nd(std::minus<int32_t>(), perproc*beg_rec));
-            std::copy(indy[i].begin(), indy[i].end(), sendindbuf + dspls[beg_rec] + alreadysent);
-            std::copy(numy[i].begin(), numy[i].end(), sendnumbuf + dspls[beg_rec] + alreadysent);
-					}
-					else	// slow case
-					{
-						int32_t cur_rec = beg_rec;
-						int32_t lastdata = (cur_rec+1) * perproc;  // one past last entry that goes to this current recipient
-						for(typename std::vector<int32_t>::iterator it = indy[i].begin(); it != indy[i].end(); ++it)
-						{
-							if( ( (*it) >= lastdata ) && cur_rec != last_rec )
-							{
-								cur_rec = std::min( (*it) / perproc, last_rec);
-								lastdata = (cur_rec+1) * perproc;
+    if(A.getnnz() > 0 && nnzx > 0)
+    {
+        int splits = A.getnsplit();
+        if(splits > 0)
+        {
+            std::vector< std::vector<int32_t> > indy(splits);
+            std::vector< std::vector< VT > > numy(splits);
+            int32_t nlocrows = static_cast<int32_t>(A.getnrow());
+            int32_t perpiece = nlocrows / splits;
+            
+            #ifdef _OPENMP
+            #pragma omp parallel for 
+            #endif
+            for(int i=0; i<splits; ++i)
+            {
+                if(i != splits-1)
+                    SpMXSpV_ForThreading<BFSsring>(*(A.GetDCSC(i)), perpiece, indx, numx, nnzx, indy[i], numy[i], i*perpiece);
+                else
+                    SpMXSpV_ForThreading<BFSsring>(*(A.GetDCSC(i)), nlocrows - perpiece*i, indx, numx, nnzx, indy[i], numy[i], i*perpiece);
+            }
+            
+            int32_t perproc = nlocrows / p_c;	
+            int32_t last_rec = p_c-1;
+            
+            // keep recipients of last entries in each split (-1 for an empty split)
+            // so that we can delete indy[] and numy[] contents as soon as they are processed		
+            std::vector<int32_t> end_recs(splits);
+            for(int i=0; i<splits; ++i)
+            {
+                if(indy[i].empty())
+                    end_recs[i] = -1;
+                else
+                    end_recs[i] = std::min(indy[i].back() / perproc, last_rec);
+            }
+            
+            int ** loc_rec_cnts = new int *[splits];	
+            #ifdef _OPENMP	
+            #pragma omp parallel for
+            #endif	
+            for(int i=0; i<splits; ++i)
+            {
+                loc_rec_cnts[i]  = new int[p_c](); // thread-local recipient data
+                if(!indy[i].empty())	// guarantee that .begin() and .end() are not null
+                {
+                    int32_t cur_rec = std::min( indy[i].front() / perproc, last_rec);
+                    int32_t lastdata = (cur_rec+1) * perproc;  // one past last entry that goes to this current recipient
+                    for(typename std::vector<int32_t>::iterator it = indy[i].begin(); it != indy[i].end(); ++it)
+                    {
+                        if( ( (*it) >= lastdata ) && cur_rec != last_rec)	
+                        {
+                            cur_rec = std::min( (*it) / perproc, last_rec);	
+                            lastdata = (cur_rec+1) * perproc;
+                        }
+                        ++loc_rec_cnts[i][cur_rec];
+                    }
+                }
+            }
+            #ifdef _OPENMP	
+            #pragma omp parallel for 
+            #endif
+            for(int i=0; i<splits; ++i)
+            {
+                if(!indy[i].empty())	// guarantee that .begin() and .end() are not null
+                {
+                    // FACT: Data is sorted, so if the recipient of begin is the same as the owner of end, 
+                    // then the whole data is sent to the same processor
+                    int32_t beg_rec = std::min( indy[i].front() / perproc, last_rec); 
+                    int32_t alreadysent = 0;	// already sent per recipient 
+                    for(int before = i-1; before >= 0; before--)
+                            alreadysent += loc_rec_cnts[before][beg_rec];
+                        
+                    if(beg_rec == end_recs[i])	// fast case
+                    {
+                        std::transform(indy[i].begin(), indy[i].end(), indy[i].begin(), std::bind(std::minus<int32_t>(),std::placeholders::_1, perproc*beg_rec));
+                        std::copy(indy[i].begin(), indy[i].end(), sendindbuf + dspls[beg_rec] + alreadysent);
+                        std::copy(numy[i].begin(), numy[i].end(), sendnumbuf + dspls[beg_rec] + alreadysent);
+                    }
+                    else	// slow case
+                    {
+                        int32_t cur_rec = beg_rec;
+                        int32_t lastdata = (cur_rec+1) * perproc;  // one past last entry that goes to this current recipient
+                        for(typename std::vector<int32_t>::iterator it = indy[i].begin(); it != indy[i].end(); ++it)
+                        {
+                            if( ( (*it) >= lastdata ) && cur_rec != last_rec )
+                            {
+                                cur_rec = std::min( (*it) / perproc, last_rec);
+                                lastdata = (cur_rec+1) * perproc;
 
-								// if this split switches to a new recipient after sending some data
-								// then it's sure that no data has been sent to that recipient yet
-						 		alreadysent = 0;
-							}
-							sendindbuf[ dspls[cur_rec] + alreadysent ] = (*it) - perproc*cur_rec;	// convert to receiver's local index
-							sendnumbuf[ dspls[cur_rec] + (alreadysent++) ] = *(numy[i].begin() + (it-indy[i].begin()));
-						}
-					}
-				}
-			}
-			// Deallocated rec counts serially once all threads complete
-			for(int i=0; i< splits; ++i)	
-			{
-				for(int j=0; j< p_c; ++j)
-					cnts[j] += loc_rec_cnts[i][j];
-				delete [] loc_rec_cnts[i];
-			}
-			delete [] loc_rec_cnts;
-		}
-		else
-		{
-			std::cout << "Something is wrong, splits should be nonzero for multithreaded execution" << std::endl;
-		}
-	}
+                                // if this split switches to a new recipient after sending some data
+                                // then it's sure that no data has been sent to that recipient yet
+                                alreadysent = 0;
+                            }
+                            sendindbuf[ dspls[cur_rec] + alreadysent ] = (*it) - perproc*cur_rec;	// convert to receiver's local index
+                            sendnumbuf[ dspls[cur_rec] + (alreadysent++) ] = *(numy[i].begin() + (it-indy[i].begin()));
+                        }
+                    }
+                }
+            }
+            // Deallocated rec counts serially once all threads complete
+            for(int i=0; i< splits; ++i)	
+            {
+                for(int j=0; j< p_c; ++j)
+                    cnts[j] += loc_rec_cnts[i][j];
+                delete [] loc_rec_cnts[i];
+            }
+            delete [] loc_rec_cnts;
+        }
+        else
+        {
+            std::cout << "Something is wrong, splits should be nonzero for multithreaded execution" << std::endl;
+        }
+    }
 }
 
 /**
@@ -187,31 +188,30 @@ void LocalSpMV(const SpParMat<IT,bool,UDER> & A, int rowneighs, OptBuf<int32_t, 
 #ifdef TIMING
 	double t0=MPI_Wtime();
 #endif
-	if(optbuf.totmax > 0)	// graph500 optimization enabled
-	{ 
-		if(A.spSeq->getnsplit() > 0)
-		{
-			// optbuf.{inds/nums/dspls} and sendcnt are all pre-allocated and only filled by dcsc_gespmv_threaded
-            
-        generic_gespmv_threaded_setbuffers< Select2ndSRing<bool, VT, VT> > (*(A.spSeq), indacc, numacc, (int32_t) accnz, optbuf.inds, optbuf.nums, sendcnt, optbuf.dspls, rowneighs);
-		}
-		else
-		{
-			// by-pass dcsc_gespmv call
-			if(A.getlocalnnz() > 0 && accnz > 0)
-			{
+    if(optbuf.totmax > 0)	// graph500 optimization enabled
+    { 
+        if(A.spSeq->getnsplit() > 0)
+        {
+            // optbuf.{inds/nums/dspls} and sendcnt are all pre-allocated and only filled by dcsc_gespmv_threaded
+            generic_gespmv_threaded_setbuffers< Select2ndSRing<bool, VT, VT> > (*(A.spSeq), indacc, numacc, (int32_t) accnz, optbuf.inds, optbuf.nums, sendcnt, optbuf.dspls, rowneighs);
+        }
+        else
+        {
+            // by-pass dcsc_gespmv call
+            if(A.getlocalnnz() > 0 && accnz > 0)
+            {
                 // ABAB: ignoring optbuf.isthere here
                 // \TODO: Remove .isthere from optbuf definition
-				SpMXSpV< Select2ndSRing<bool, VT, VT> >(*((A.spSeq)->GetInternal()), (int32_t) A.getlocalrows(), indacc, numacc,
-					accnz, optbuf.inds, optbuf.nums, sendcnt, optbuf.dspls, rowneighs);
-			}
-		}
-		DeleteAll(indacc,numacc);
-	}
-	else
-	{
-		SpParHelper::Print("BFS only (no semiring) function only work with optimization buffers\n");
-	}
+                SpMXSpV< Select2ndSRing<bool, VT, VT> >(*((A.spSeq)->GetInternal()), (int32_t) A.getlocalrows(), indacc, numacc,
+                    accnz, optbuf.inds, optbuf.nums, sendcnt, optbuf.dspls, rowneighs);
+            }
+        }
+        DeleteAll(indacc,numacc);
+    }
+    else
+    {
+        SpParHelper::Print("BFS only (no semiring) function only work with optimization buffers\n");
+    }
 
 #ifdef TIMING
 	double t1=MPI_Wtime();

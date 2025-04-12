@@ -5,7 +5,9 @@
 
 #ifndef _OLD_REDUCTIONS_H_
 #define _OLD_REDUCTIONS_H_
-
+#include <cstdint>
+#include <tuple>
+#include <mpi.h>
 // localmerged is invalidated in all processes after this redursive function
 // globalmerged is valid only in fibWorld root (0) upon exit
 template <typename SR>

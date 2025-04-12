@@ -1,0 +1,50 @@
+MPI Size: 16 Threads Numbers: 16
+using graph partitioner results!
+Total number of nonzeros expected across all processors is 5154859
+File is 80255546 bytes
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+Fetching first piece
+Fetched first piece
+Reading input file....
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+As a whole: 5154859 rows and 5154859 columns and 99199551 nonzeros and 1587.19 MB.
+Reader took 2.85372 seconds
+matrix is not symm, I will add transpose to make it symm and adapt GP results.
+Perfoming gp permuation of matrix.
+Permutation took 5.08123 seconds
+Input load balance: 4.50481
+Reading matrix: /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/cage15.mtx
+Computing restriction matrix
+As a whole: 5154859 rows and 5154859 columns and 94044692 nonzeros and 846.402 MB.
+As a whole, mis2 has: 138300 nonzeros and length 5154859
+As a whole, mis2neighUnion has: 5154859 nonzeros and length 5154859
+As a whole: 5154859 rows and 138300 columns and 5154859 nonzeros and 82.4777 MB.
+Rop final (before normalization)... Load balance (before): 3.76809
+Load balance (after): 1.00574
+Restriction Op computed : time 10.4069
+=============A square============
+Timer|Info: AA_1D_CBC|Time: 1.615686
+nnz(A)=   99199551
+nnz(AA)=  929023247
+=============RT * A============
+Timer|Info: RTA_2D|Time: 0.878666
+Timer|Info: CBC_RTA_1D|Time: 0.425806
+nnz(RT)=  5154859
+nnz(A)=   99199551
+nnz(RTA)= 46986000
+RTA pass!
+=============RTA * R============
+Timer|Info: RTAR_2D|Time: 0.456201
+Timer|Info: RTAR_1D|Time: 0.587001
+nnz(RTA)= 46986000
+nnz(R)=   5154859
+nnz(RTAR)=12054404
+cbc-RTAR pass!
+=============RTA * R Out Product============
+Timer|Info: RTAR_1DOP|Time: 0.066869
+nnz(RTA)= 46986000
+nnz(R)=   5154859
+nnz(RTAR)=12054404
+cbc-RTAR-1DOP outproduct pass!

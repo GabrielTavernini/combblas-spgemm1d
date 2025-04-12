@@ -1,0 +1,21 @@
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+matrix is symm!!!
+      Setup: Max:   0.119, Sum:   1.902, Balance:   1.000
+   Matching: Max:   0.058, Sum:   0.925, Balance:   1.000
+Contraction: Max:   0.041, Sum:   0.651, Balance:   1.000
+   InitPart: Max:   0.003, Sum:   0.043, Balance:   1.000
+    Project: Max:   0.001, Sum:   0.011, Balance:   1.248
+ Initialize: Max:   0.011, Sum:   0.175, Balance:   1.030
+      K-way: Max:   0.017, Sum:   0.275, Balance:   1.001
+      Remap: Max:   0.000, Sum:   0.003, Balance:   1.002
+      Total: Max:   0.250, Sum:   3.993, Balance:   1.000
+we run partitioner in 252.216 ms!
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+order.txt exists , deleted it.
+totnvtx 952203 metis nvtxs 952203
+permute time 2.074278 s

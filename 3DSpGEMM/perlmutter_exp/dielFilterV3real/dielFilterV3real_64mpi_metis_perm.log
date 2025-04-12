@@ -1,0 +1,42 @@
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+As a whole: 1102824 rows and 1102824 columns and 89306020 nonzeros and 1428.9 MB.
+Reader took 0.659583 seconds
+matrix is symm, no need for add transpose.
+Perfoming gp permuation of matrix.
+Permutation took 3.86176 seconds
+Input load balance: 7.63267
+Reading matrix: /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/dielFilterV3real.mtx
+Computing restriction matrix
+As a whole: 1102824 rows and 1102824 columns and 88203196 nonzeros and 793.829 MB.
+As a whole, mis2 has: 6465 nonzeros and length 1102824
+As a whole, mis2neighUnion has: 1102824 nonzeros and length 1102824
+As a whole: 1102824 rows and 6465 columns and 1102824 nonzeros and 17.6452 MB.
+Rop final (before normalization)... Load balance (before): 7.44097
+Load balance (after): 1.12003
+Restriction Op computed : time 2.54482
+=============A square============
+Timer|Info: AA_1D_CBC|Time: 0.441890
+nnz(A)=   89306020
+nnz(AA)=  688649400
+=============RT * A============
+Timer|Info: RTA_2D|Time: 0.571823
+Timer|Info: CBC_RTA_1D|Time: 0.137613
+nnz(RT)=  1102824
+nnz(A)=   89306020
+nnz(RTA)= 4356741
+RTA pass!
+=============RTA * R============
+Timer|Info: RTAR_2D|Time: 0.037196
+Timer|Info: RTAR_1D|Time: 0.078469
+nnz(RTA)= 4356741
+nnz(R)=   1102824
+nnz(RTAR)=103388
+cbc-RTAR pass!
+=============RTA * R Out Product============
+Timer|Info: RTAR_1DOP|Time: 0.004014
+nnz(RTA)= 4356741
+nnz(R)=   1102824
+nnz(RTAR)=103388
+cbc-RTAR-1DOP outproduct pass!

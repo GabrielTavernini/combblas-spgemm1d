@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
             SpParMat3D<int64_t, double, SpDCCols < int64_t, double >> C3D = 
                 Mult_AnXBn_SUMMA3D<PTFF, double, SpDCCols<int64_t, double>, int64_t, double, double, SpDCCols<int64_t, double>, SpDCCols<int64_t, double> >
                 (A3D, B3D);
-
+            
             SpParMat<int64_t, double, SpDCCols < int64_t, double >> C3D2D = C3D.Convert2D();
             if(C2D == C3D2D){
                 if(myrank == 0) fprintf(stderr, "Correct!\n");

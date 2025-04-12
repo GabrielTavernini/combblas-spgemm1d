@@ -1,0 +1,42 @@
+MPI Size: 16 Threads Numbers: 16
+no permutation!
+Reading input file....
+Matrix is symmetric
+As a whole: 45101 rows and 45101 columns and 28967291 nonzeros and 463.477 MB.
+Reader took 0.55309 seconds
+Input load balance: 1.57462
+Reading matrix: /pscratch/sd/y/yuxihong/graphclustering/dataset/1DspGEMM/mouse_gene.mtx
+Computing restriction matrix
+As a whole: 45101 rows and 45101 columns and 28922190 nonzeros and 260.3 MB.
+As a whole, mis2 has: 4184 nonzeros and length 45101
+As a whole, mis2neighUnion has: 45101 nonzeros and length 45101
+As a whole: 45101 rows and 4184 columns and 45101 nonzeros and 0.721616 MB.
+Rop final (before normalization)... Load balance (before): 1.92599
+Load balance (after): 1.39882
+Restriction Op computed : time 0.918916
+=============A square============
+Timer|Info: AA_2D|Time: 8.434510
+Timer|Info: AA_1D_CBC|Time: 6.025087
+nnz(A)=   28967291
+nnz(AA)=  482594045
+AA pass!
+=============RT * A============
+Timer|Info: RTA_2D|Time: 0.122848
+Timer|Info: CBC_RTA_1D|Time: 0.031133
+nnz(RT)=  45101
+nnz(A)=   28967291
+nnz(RTA)= 3029259
+RTA pass!
+=============RTA * R============
+Timer|Info: RTAR_2D|Time: 0.021658
+Timer|Info: RTAR_1D|Time: 0.017895
+nnz(RTA)= 3029259
+nnz(R)=   45101
+nnz(RTAR)=313798
+cbc-RTAR pass!
+=============RTA * R Out Product============
+Timer|Info: RTAR_1DOP|Time: 0.004449
+nnz(RTA)= 3029259
+nnz(R)=   45101
+nnz(RTAR)=313798
+cbc-RTAR-1DOP outproduct pass!

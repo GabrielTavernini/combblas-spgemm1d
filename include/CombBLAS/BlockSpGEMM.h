@@ -1,8 +1,9 @@
 #ifndef _BLOCK_SPGEMM_H_
 #define _BLOCK_SPGEMM_H_
 
-#include "CombBLAS.h"
+// #include "CombBLAS.h"
 
+#include "SpParMat.h"
 
 namespace combblas
 {

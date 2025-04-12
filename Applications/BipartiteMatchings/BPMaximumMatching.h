@@ -474,8 +474,8 @@ void maximumMatching(SpParMat < IT, NT, DER > & A, FullyDistVec<IT, IT>& mateRow
     {
         std::cout << "***Final Maximum Matching***\n";
         std::cout << "***Total-Rows Matched-Rows  Total Time***\n";
-        printf("%lld %lld %lf \n",nrows, matchedRow, combTime);
-        printf("matched rows: %lld , which is: %lf percent \n",matchedRow, 100*(double)matchedRow/(nrows));
+        printf("%ld %ld %lf \n",nrows, matchedRow, combTime);
+        printf("matched rows: %ld , which is: %lf percent \n",matchedRow, 100*(double)matchedRow/(nrows));
         std::cout << "-------------------------------------------------------\n\n";
     }
 #endif

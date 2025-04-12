@@ -1,0 +1,6 @@
+add_executable(MKLSpGEMM_Bench ${CMAKE_CURRENT_SOURCE_DIR}/mkl/spgemm-benchmark.cpp)
+set(MKL_ARCH intel64)
+set(MKL_LINK static)
+set(MKL_THREADING gnu_thread)
+find_package(MKL REQUIRED)
+target_link_libraries(MKLSpGEMM_Bench PUBLIC MKL::MKL)

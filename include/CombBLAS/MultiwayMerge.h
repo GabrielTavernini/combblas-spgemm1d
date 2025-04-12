@@ -143,13 +143,13 @@ IT SerialMergeNNZ( const std::vector<SpTuples<IT,NT> *> & ArrSpTups)
         }
         
     }
-    std::make_heap(heap.data(), heap.data()+hsize, std::not2(heapcomp));
+    std::make_heap(heap.data(), heap.data()+hsize, std::not_fn(heapcomp));
     
     std::tuple<IT, IT, NT> curTuple;
     IT estnnz = 0;
     while(hsize > 0)
     {
-      std::pop_heap(heap.data(), heap.data() + hsize, std::not2(heapcomp));   // result is stored in heap[hsize-1]
+      std::pop_heap(heap.data(), heap.data() + hsize, std::not_fn(heapcomp));   // result is stored in heap[hsize-1]
         int source = std::get<2>(heap[hsize-1]);
         if( (estnnz ==0) || (std::get<0>(curTuple) != std::get<0>(heap[hsize-1])) || (std::get<1>(curTuple) != std::get<1>(heap[hsize-1])))
         {
@@ -161,7 +161,7 @@ IT SerialMergeNNZ( const std::vector<SpTuples<IT,NT> *> & ArrSpTups)
         {
             heap[hsize-1] = std::make_tuple(std::get<0>(ArrSpTups[source]->tuples[curptr[source]]),
                                        std::get<1>(ArrSpTups[source]->tuples[curptr[source]]), source);
-            std::push_heap(heap.data(), heap.data()+hsize, std::not2(heapcomp));
+            std::push_heap(heap.data(), heap.data()+hsize, std::not_fn(heapcomp));
         }
         else
         {
@@ -199,12 +199,12 @@ void SerialMerge( const std::vector<SpTuples<IT,NT> *> & ArrSpTups, std::tuple<I
         }
         
     }
-    std::make_heap(heap.data(), heap.data()+hsize, std::not2(heapcomp));
+    std::make_heap(heap.data(), heap.data()+hsize, std::not_fn(heapcomp));
     IT cnz = 0;
     
     while(hsize > 0)
     {
-      std::pop_heap(heap.data(), heap.data() + hsize, std::not2(heapcomp));   // result is stored in heap[hsize-1]
+      std::pop_heap(heap.data(), heap.data() + hsize, std::not_fn(heapcomp));   // result is stored in heap[hsize-1]
         int source = std::get<2>(heap[hsize-1]);
         
         if( (cnz != 0) &&
@@ -221,7 +221,7 @@ void SerialMerge( const std::vector<SpTuples<IT,NT> *> & ArrSpTups, std::tuple<I
         {
             heap[hsize-1] = std::make_tuple(std::get<0>(ArrSpTups[source]->tuples[curptr[source]]),
                                        std::get<1>(ArrSpTups[source]->tuples[curptr[source]]), source);
-            std::push_heap(heap.data(), heap.data()+hsize, std::not2(heapcomp));
+            std::push_heap(heap.data(), heap.data()+hsize, std::not_fn(heapcomp));
         }
         else
         {
@@ -444,7 +444,9 @@ SpTuples<IT, NT>* MultiwayMerge( std::vector<SpTuples<IT,NT> *> & ArrSpTups, IT 
     {
         if((mdim != ArrSpTups[i]->getnrow()) || ndim != ArrSpTups[i]->getncol())
         {
-            std::cerr << "Dimensions of SpTuples do not match on multiwayMerge()" << std::endl;
+            std::cerr << "Dimensions of SpTuples do not match on multiwayMerge()"<< std::endl;
+            std::cerr << i << ", " << mdim << ", " <<  ArrSpTups[i]->getnrow();
+            std::cerr << ndim << ", " <<  ArrSpTups[i]->getncol() << std::endl;
             return new SpTuples<IT,NT>(0,0,0);
         }
     }

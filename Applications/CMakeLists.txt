@@ -1,17 +1,15 @@
 # Top level directory has the include files
 
-# add_executable(spgemm1d SpGEMM1D.cpp)
-# target_link_libraries(spgemm1d CombBLAS)
-
-# ADD_EXECUTABLE( mcl MCL.cpp )
-# TARGET_LINK_LIBRARIES( mcl CombBLAS)
 
 # ADD_EXECUTABLE( tdbfs TopDownBFS.cpp )
 # ADD_EXECUTABLE( dobfs DirOptBFS.cpp )
 # ADD_EXECUTABLE( fbfs FilteredBFS.cpp )
 # ADD_EXECUTABLE( fmis FilteredMIS.cpp )
 # ADD_EXECUTABLE( mcl MCL.cpp )
-# ADD_EXECUTABLE( betwcent BetwCent.cpp )
+ADD_EXECUTABLE( betwcent BetwCent.cpp )
+# ADD_EXECUTABLE( betwcentint BetwCentint.cpp )
+# ADD_EXECUTABLE( betwcent_backup BetwCent_backup.cpp )
+# ADD_EXECUTABLE( betwcent1d BetwCent1d.cpp )
 # ADD_EXECUTABLE(lacc CC.cpp)
 
 # TARGET_LINK_LIBRARIES( tdbfs CombBLAS)
@@ -19,7 +17,10 @@
 # TARGET_LINK_LIBRARIES( fbfs CombBLAS)
 # TARGET_LINK_LIBRARIES( fmis CombBLAS)
 # TARGET_LINK_LIBRARIES( mcl CombBLAS)
-# TARGET_LINK_LIBRARIES( betwcent CombBLAS)
+TARGET_LINK_LIBRARIES( betwcent CombBLAS)
+# TARGET_LINK_LIBRARIES( betwcentint CombBLAS)
+# TARGET_LINK_LIBRARIES( betwcent_backup CombBLAS)
+# TARGET_LINK_LIBRARIES( betwcent1d CombBLAS)
 # TARGET_LINK_LIBRARIES( lacc CombBLAS)
 
 # ADD_TEST(NAME BetwCent_Test COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 $<TARGET_FILE:betwcent> ../TESTDATA/SCALE16BTW-TRANSBOOL/ 10 96 )

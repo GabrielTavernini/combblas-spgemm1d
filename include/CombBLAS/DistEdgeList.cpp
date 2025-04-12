@@ -48,7 +48,7 @@ namespace combblas {
 template <typename IT>
 DistEdgeList<IT>::DistEdgeList(): edges(NULL), pedges(NULL), nedges(0), globalV(0)
 {
-	commGrid.reset(new CommGrid(MPI_COMM_WORLD, 0, 0));
+    commGrid.reset(new CommGrid(MPI_COMM_WORLD, 0, 0));
 }
 
 template <typename IT>
@@ -60,45 +60,45 @@ DistEdgeList<IT>::DistEdgeList(MPI_Comm & myWorld): edges(NULL), pedges(NULL), n
 template <typename IT>
 DistEdgeList<IT>::DistEdgeList(const char * filename, IT globaln, IT globalm): edges(NULL), pedges(NULL), globalV(globaln)
 {
-	commGrid.reset(new CommGrid(MPI_COMM_WORLD, 0, 0));
+    commGrid.reset(new CommGrid(MPI_COMM_WORLD, 0, 0));
 
-	int nprocs = commGrid->GetSize();
-	int rank = commGrid->GetRank();
-	nedges = (rank == nprocs-1)? (globalm - rank * (globalm / nprocs)) : (globalm / nprocs);
+    int nprocs = commGrid->GetSize();
+    int rank = commGrid->GetRank();
+    nedges = (rank == nprocs-1)? (globalm - rank * (globalm / nprocs)) : (globalm / nprocs);
 
-	FILE * infp = fopen(filename, "rb");
-	assert(infp != NULL);
-	IT read_offset_start, read_offset_end;
-	read_offset_start = rank * 8 * (globalm / nprocs);
-	read_offset_end = (rank+1) * 8 * (globalm / nprocs);
-	if (rank == nprocs - 1)
-   		read_offset_end = 8*globalm;
+    FILE * infp = fopen(filename, "rb");
+    assert(infp != NULL);
+    IT read_offset_start, read_offset_end;
+    read_offset_start = rank * 8 * (globalm / nprocs);
+    read_offset_end = (rank+1) * 8 * (globalm / nprocs);
+    if (rank == nprocs - 1)
+        read_offset_end = 8*globalm;
 
 
-	std::ofstream oput;
-	commGrid->OpenDebugFile("BinRead", oput);
-	if(infp != NULL)
-	{	
-		oput << "File exists" << std::endl;
-		oput << "Trying to read " << nedges << " edges out of " << globalm << std::endl;
-	}
-	else
-	{
-		oput << "File does not exist" << std::endl;
-	}
-	
-	/* gen_edges is an array of unsigned ints of size 2*nedges */
-	uint32_t * gen_edges = new uint32_t[2*nedges];
-	fseek(infp, read_offset_start, SEEK_SET);
-	fread(gen_edges, 2*nedges, sizeof(uint32_t), infp);
-	SetMemSize(nedges);
-	oput << "Freads done " << std::endl;
-	for(IT i=0; i< 2*nedges; ++i)
-		edges[i] = (IT) gen_edges[i];
-	oput << "Puts done " << std::endl;
-	delete [] gen_edges;
-	oput.close();
-	
+    std::ofstream oput;
+    commGrid->OpenDebugFile("BinRead", oput);
+    if(infp != NULL)
+    {	
+        oput << "File exists" << std::endl;
+        oput << "Trying to read " << nedges << " edges out of " << globalm << std::endl;
+    }
+    else
+    {
+        oput << "File does not exist" << std::endl;
+    }
+
+    /* gen_edges is an array of unsigned ints of size 2*nedges */
+    uint32_t * gen_edges = new uint32_t[2*nedges];
+    fseek(infp, read_offset_start, SEEK_SET);
+    fread(gen_edges, 2*nedges, sizeof(uint32_t), infp);
+    SetMemSize(nedges);
+    oput << "Freads done " << std::endl;
+    for(IT i=0; i< 2*nedges; ++i)
+        edges[i] = (IT) gen_edges[i];
+    oput << "Puts done " << std::endl;
+    delete [] gen_edges;
+    oput.close();
+
 }
 
 #if 0
@@ -222,61 +222,61 @@ void DistEdgeList<IT>::CleanupEmpties()
 template <typename IT>
 void DistEdgeList<IT>::GenGraph500Data(double initiator[4], int log_numverts, int edgefactor, bool scramble, bool packed)
 {
-	if(packed && (!scramble))
-	{
-		SpParHelper::Print("WARNING: Packed version does always generate scrambled vertex identifiers\n");
-	}
+    if(packed && (!scramble))
+    {
+        SpParHelper::Print("WARNING: Packed version does always generate scrambled vertex identifiers\n");
+    }
 
-	globalV = ((int64_t)1)<< log_numverts;
-	int64_t globaledges = globalV * static_cast<int64_t>(edgefactor);
+    globalV = ((int64_t)1)<< log_numverts;
+    int64_t globaledges = globalV * static_cast<int64_t>(edgefactor);
 
-	if(packed)
-	{
-		RefGen21::make_graph (log_numverts, globaledges, &nedges, (packed_edge**)(&pedges), commGrid->GetWorld());
-	}
-	else
-	{
-		// The generations use different seeds on different processors, generating independent 
-		// local RMAT matrices all having vertex ranges [0,...,globalmax-1]
-		// Spread the two 64-bit numbers into five nonzero values in the correct range
-		uint_fast32_t seed[5];
+    if(packed)
+    {
+        RefGen21::make_graph (log_numverts, globaledges, &nedges, (packed_edge**)(&pedges), commGrid->GetWorld());
+    }
+    else
+    {
+        // The generations use different seeds on different processors, generating independent 
+        // local RMAT matrices all having vertex ranges [0,...,globalmax-1]
+        // Spread the two 64-bit numbers into five nonzero values in the correct range
+        uint_fast32_t seed[5];
 
-		uint64_t size = (uint64_t) commGrid->GetSize();
-		uint64_t rank = (uint64_t) commGrid->GetRank();
-	#ifdef DETERMINISTIC
-		uint64_t seed2 = 2;
-	#else
-		uint64_t seed2 = time(NULL);
-	#endif
-		make_mrg_seed(rank, seed2, seed);	// we give rank as the first seed, so it is different on processors
+        uint64_t size = (uint64_t) commGrid->GetSize();
+        uint64_t rank = (uint64_t) commGrid->GetRank();
+    #ifdef DETERMINISTIC
+        uint64_t seed2 = 2;
+    #else
+        uint64_t seed2 = time(NULL);
+    #endif
+        make_mrg_seed(rank, seed2, seed);	// we give rank as the first seed, so it is different on processors
 
-		// a single pair of [val0,val1] for all the computation, global across all processors
-		uint64_t val0, val1; /* Values for scrambling */
-		if(scramble)
-		{
-			if(rank == 0)		
-				RefGen21::MakeScrambleValues(val0, val1, seed);	// ignore the return value
+        // a single pair of [val0,val1] for all the computation, global across all processors
+        uint64_t val0, val1; /* Values for scrambling */
+        if(scramble)
+        {
+            if(rank == 0)		
+                RefGen21::MakeScrambleValues(val0, val1, seed);	// ignore the return value
 
-			MPI_Bcast(&val0, 1, MPIType<uint64_t>(),0, commGrid->GetWorld());
- 			MPI_Bcast(&val1, 1, MPIType<uint64_t>(),0, commGrid->GetWorld());
-		}
+            MPI_Bcast(&val0, 1, MPIType<uint64_t>(),0, commGrid->GetWorld());
+            MPI_Bcast(&val1, 1, MPIType<uint64_t>(),0, commGrid->GetWorld());
+        }
 
-		nedges = globaledges/size;
-		SetMemSize(nedges);	
-		// clear the source vertex by setting it to -1
-		for (IT i = 0; i < nedges; i++)
-			edges[2*i+0] = -1;
-	
-		generate_kronecker(0, 1, seed, log_numverts, nedges, initiator, edges);
-		if(scramble)
-		{
-			for(IT i=0; i < nedges; ++i)
-			{
-				edges[2*i+0] = RefGen21::scramble(edges[2*i+0], log_numverts, val0, val1);
-				edges[2*i+1] = RefGen21::scramble(edges[2*i+1], log_numverts, val0, val1);
-			}
-		}
-	}
+        nedges = globaledges/size;
+        SetMemSize(nedges);	
+        // clear the source vertex by setting it to -1
+        for (IT i = 0; i < nedges; i++)
+            edges[2*i+0] = -1;
+
+        generate_kronecker(0, 1, seed, log_numverts, nedges, initiator, edges);
+        if(scramble)
+        {
+            for(IT i=0; i < nedges; ++i)
+            {
+                edges[2*i+0] = RefGen21::scramble(edges[2*i+0], log_numverts, val0, val1);
+                edges[2*i+1] = RefGen21::scramble(edges[2*i+1], log_numverts, val0, val1);
+            }
+        }
+    }
 }
 
 
@@ -293,61 +293,61 @@ void DistEdgeList<IT>::GenGraph500Data(double initiator[4], int log_numverts, in
 template <typename IT>
 void PermEdges(DistEdgeList<IT> & DEL)
 {
-	IT maxedges = DEL.memedges;	// this can be optimized by calling the clean-up first
-	
-	// to lower memory consumption, rename in stages
-	// this is not "identical" to a full randomization; 
-	// but more than enough to destroy any possible locality 
-	IT stages = 8;	
-	IT perstage = maxedges / stages;
-	
-	int nproc =(DEL.commGrid)->GetSize();
-	int rank = (DEL.commGrid)->GetRank();
-	IT * dist = new IT[nproc];
+    IT maxedges = DEL.memedges;	// this can be optimized by calling the clean-up first
+
+    // to lower memory consumption, rename in stages
+    // this is not "identical" to a full randomization; 
+    // but more than enough to destroy any possible locality 
+    IT stages = 8;	
+    IT perstage = maxedges / stages;
+
+    int nproc =(DEL.commGrid)->GetSize();
+    int rank = (DEL.commGrid)->GetRank();
+    IT * dist = new IT[nproc];
 
 #ifdef DETERMINISTIC
 	MTRand M(1);
 #else
 	MTRand M;	// generate random numbers with Mersenne Twister 
 #endif
-	for(IT s=0; s< stages; ++s)
-	{
-		#ifdef DEBUG
-		SpParHelper::Print("PermEdges stage starting\n");	
-		double st = MPI_Wtime();
-		#endif
-	
-		IT n_sofar = s*perstage;
-		IT n_thisstage = ((s==(stages-1))? (maxedges - n_sofar): perstage);
+    for(IT s=0; s< stages; ++s)
+    {
+        #ifdef DEBUG
+        SpParHelper::Print("PermEdges stage starting\n");	
+        double st = MPI_Wtime();
+        #endif
 
-		std::pair<double, std::pair<IT,IT> >* vecpair = new std::pair<double, std::pair<IT,IT> >[n_thisstage];
-		dist[rank] = n_thisstage;
-		MPI_Allgather(MPI_IN_PLACE, 1, MPIType<IT>(), dist, 1, MPIType<IT>(), DEL.commGrid->GetWorld());
+        IT n_sofar = s*perstage;
+        IT n_thisstage = ((s==(stages-1))? (maxedges - n_sofar): perstage);
 
-		for (IT i = 0; i < n_thisstage; i++)
-		{
-			vecpair[i].first = M.rand();
-			vecpair[i].second.first = DEL.edges[2*(i+n_sofar)];
-			vecpair[i].second.second = DEL.edges[2*(i+n_sofar)+1];
-		}
+        std::pair<double, std::pair<IT,IT> >* vecpair = new std::pair<double, std::pair<IT,IT> >[n_thisstage];
+        dist[rank] = n_thisstage;
+        MPI_Allgather(MPI_IN_PLACE, 1, MPIType<IT>(), dist, 1, MPIType<IT>(), DEL.commGrid->GetWorld());
 
-		// less< pair<T1,T2> > works correctly (sorts w.r.t. first element of type T1)	
-		SpParHelper::MemoryEfficientPSort(vecpair, n_thisstage, dist, DEL.commGrid->GetWorld());
-		// SpParHelper::DebugPrintKeys(vecpair, n_thisstage, dist, DEL.commGrid->GetWorld());
-		for (IT i = 0; i < n_thisstage; i++)
-		{
-			DEL.edges[2*(i+n_sofar)] = vecpair[i].second.first;
-			DEL.edges[2*(i+n_sofar)+1] = vecpair[i].second.second;
-		}
-		delete [] vecpair;
-		#ifdef DEBUG
-		double et = MPI_Wtime();
-    std::ostringstream timeinfo;
-		timeinfo << "Stage " << s << " in " << et-st << " seconds" << std::endl;
-		SpParHelper::Print(timeinfo.str());
-		#endif
-	}
-	delete [] dist;
+        for (IT i = 0; i < n_thisstage; i++)
+        {
+            vecpair[i].first = M.rand();
+            vecpair[i].second.first = DEL.edges[2*(i+n_sofar)];
+            vecpair[i].second.second = DEL.edges[2*(i+n_sofar)+1];
+        }
+
+        // less< pair<T1,T2> > works correctly (sorts w.r.t. first element of type T1)	
+        SpParHelper::MemoryEfficientPSort(vecpair, n_thisstage, dist, DEL.commGrid->GetWorld());
+        // SpParHelper::DebugPrintKeys(vecpair, n_thisstage, dist, DEL.commGrid->GetWorld());
+        for (IT i = 0; i < n_thisstage; i++)
+        {
+            DEL.edges[2*(i+n_sofar)] = vecpair[i].second.first;
+            DEL.edges[2*(i+n_sofar)+1] = vecpair[i].second.second;
+        }
+        delete [] vecpair;
+        #ifdef DEBUG
+        double et = MPI_Wtime();
+        std::ostringstream timeinfo;
+        timeinfo << "Stage " << s << " in " << et-st << " seconds" << std::endl;
+        SpParHelper::Print(timeinfo.str());
+        #endif
+    }
+    delete [] dist;
 }
 
 /**
@@ -363,64 +363,64 @@ void PermEdges(DistEdgeList<IT> & DEL)
 template <typename IU>
 void RenameVertices(DistEdgeList<IU> & DEL)
 {
-	int nprocs = DEL.commGrid->GetSize();
-	int rank = DEL.commGrid->GetRank();
-	MPI_Comm World = DEL.commGrid->GetWorld(); 
+    int nprocs = DEL.commGrid->GetSize();
+    int rank = DEL.commGrid->GetRank();
+    MPI_Comm World = DEL.commGrid->GetWorld(); 
 
-	// create permutation
-	FullyDistVec<IU, IU> globalPerm(DEL.commGrid);
-	globalPerm.iota(DEL.getGlobalV(), 0);
-	globalPerm.RandPerm();	// now, randperm can return a 0-based permutation
-	IU locrows = globalPerm.MyLocLength(); 
-	
-	// way to mark whether each vertex was already renamed or not
-	IU locedgelist = 2*DEL.getNumLocalEdges();
-	bool* renamed = new bool[locedgelist];
-	std::fill_n(renamed, locedgelist, 0);
-	
-	// permutation for one round
-	IU * localPerm = NULL;
-	IU permsize;
-	IU startInd = 0;
+    // create permutation
+    FullyDistVec<IU, IU> globalPerm(DEL.commGrid);
+    globalPerm.iota(DEL.getGlobalV(), 0);
+    globalPerm.RandPerm();	// now, randperm can return a 0-based permutation
+    IU locrows = globalPerm.MyLocLength(); 
 
-	//vector < pair<IU, IU> > vec;
-	//for(IU i=0; i< DEL.getNumLocalEdges(); i++)
-	//	vec.push_back(make_pair(DEL.edges[2*i], DEL.edges[2*i+1]));
-	//sort(vec.begin(), vec.end());
-	//vector < pair<IU, IU> > uniqued;
-	//unique_copy(vec.begin(), vec.end(), back_inserter(uniqued));
-	//cout << "before: " << vec.size() << " and after: " << uniqued.size() << endl;
-	
-	for (int round = 0; round < nprocs; round++)
-	{
-		// broadcast the permutation from the one processor
-		if (rank == round)
-		{
-			permsize = locrows;
-			localPerm = new IU[permsize];
-      std::copy(globalPerm.arr.begin(), globalPerm.arr.end(), localPerm);
-		}
-		MPI_Bcast(&permsize, 1, MPIType<IU>(), round, World);
-		if(rank != round)
-		{
-			localPerm = new IU[permsize];
-		}
-		MPI_Bcast(localPerm, permsize, MPIType<IU>(), round, World);
-	
-		// iterate over 	
-		for (typename std::vector<IU>::size_type j = 0; j < (unsigned)locedgelist ; j++)
-		{
-			// We are renaming vertices, not edges
-			if (startInd <= DEL.edges[j] && DEL.edges[j] < (startInd + permsize) && !renamed[j])
-			{
-				DEL.edges[j] = localPerm[DEL.edges[j]-startInd];
-				renamed[j] = true;
-			}
-		}
-		startInd += permsize;
-		delete [] localPerm;
-	}
-	delete [] renamed;
+    // way to mark whether each vertex was already renamed or not
+    IU locedgelist = 2*DEL.getNumLocalEdges();
+    bool* renamed = new bool[locedgelist];
+    std::fill_n(renamed, locedgelist, 0);
+
+    // permutation for one round
+    IU * localPerm = NULL;
+    IU permsize;
+    IU startInd = 0;
+
+    //vector < pair<IU, IU> > vec;
+    //for(IU i=0; i< DEL.getNumLocalEdges(); i++)
+    //	vec.push_back(make_pair(DEL.edges[2*i], DEL.edges[2*i+1]));
+    //sort(vec.begin(), vec.end());
+    //vector < pair<IU, IU> > uniqued;
+    //unique_copy(vec.begin(), vec.end(), back_inserter(uniqued));
+    //cout << "before: " << vec.size() << " and after: " << uniqued.size() << endl;
+
+    for (int round = 0; round < nprocs; round++)
+    {
+        // broadcast the permutation from the one processor
+        if (rank == round)
+        {
+            permsize = locrows;
+            localPerm = new IU[permsize];
+        std::copy(globalPerm.arr.begin(), globalPerm.arr.end(), localPerm);
+        }
+        MPI_Bcast(&permsize, 1, MPIType<IU>(), round, World);
+        if(rank != round)
+        {
+            localPerm = new IU[permsize];
+        }
+        MPI_Bcast(localPerm, permsize, MPIType<IU>(), round, World);
+
+        // iterate over 	
+        for (typename std::vector<IU>::size_type j = 0; j < (unsigned)locedgelist ; j++)
+        {
+            // We are renaming vertices, not edges
+            if (startInd <= DEL.edges[j] && DEL.edges[j] < (startInd + permsize) && !renamed[j])
+            {
+                DEL.edges[j] = localPerm[DEL.edges[j]-startInd];
+                renamed[j] = true;
+            }
+        }
+        startInd += permsize;
+        delete [] localPerm;
+    }
+    delete [] renamed;
 }
 
 }

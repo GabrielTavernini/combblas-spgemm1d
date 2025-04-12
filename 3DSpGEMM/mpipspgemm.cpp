@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <cmath>
 #include "CombBLAS/CombBLAS.h"
+#include "CombBLAS/SpHelper.h"
 #include "Glue.h"
 #include "CCGrid.h"
 #include "Reductions.h"
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
             printf("Usage (random): ./mpipspgemm <GridRows> <GridCols> <Layers> <Type> <Scale> <EDGEFACTOR> <algo>\n");
             printf("Usage (input): ./mpipspgemm <GridRows> <GridCols> <Layers> <Type=input> <matA> <matB> <algo>\n");
             printf("Example: ./mpipspgemm 4 4 2 ER 19 16 outer\n");
-            printf("Example: ./mpipspgemm 4 4 2 Input matA.mtx matB.mtx column\n");
+            printf("Example: ./mpipspgemm 4 4 2 input matA.mtx matB.mtx column\n");
             printf("Type ER: Erdos-Renyi\n");
             printf("Type SSCA: R-MAT with SSCA benchmark parameters\n");
             printf("Type G500: R-MAT with Graph500 benchmark parameters\n");
@@ -64,18 +65,16 @@ int main(int argc, char *argv[])
         return -1;
     }
     
-    
-    unsigned GRROWS = (unsigned) atoi(argv[1]);
-    unsigned GRCOLS = (unsigned) atoi(argv[2]);
-    unsigned C_FACTOR = (unsigned) atoi(argv[3]);
+    int argidx = 1;
+    unsigned GRROWS = (unsigned) atoi(argv[argidx++]);
+    unsigned GRCOLS = (unsigned) atoi(argv[argidx++]);
+    unsigned C_FACTOR = (unsigned) atoi(argv[argidx++]);
     CCGrid CMG(C_FACTOR, GRCOLS);
     int nthreads;
 #pragma omp parallel
     {
         nthreads = omp_get_num_threads();
     }
-    
-    
     if(GRROWS != GRCOLS)
     {
         SpParHelper::Print("This version of the Combinatorial BLAS only works on a square logical processor grid\n");
@@ -90,7 +89,7 @@ int main(int argc, char *argv[])
         MPI_Barrier(MPI_COMM_WORLD);
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
-    
+    SpHelper::initdatasetmap();
     {
         SpDCCols<int64_t, double> splitA, splitB;
         SpDCCols<int64_t, double> *splitC;
@@ -98,12 +97,22 @@ int main(int argc, char *argv[])
         shared_ptr<CommGrid> layerGrid;
         layerGrid.reset( new CommGrid(CMG.layerWorld, 0, 0) );
         FullyDistVec<int64_t, int64_t> p(layerGrid); // permutation vector defined on layers
-        
-        if(string(argv[4]) == string("input")) // input option
+        string inputtype(argv[argidx++]);
+        printf("inputtype %s \n", inputtype.c_str());
+        if(inputtype == string("input")) // input option
         {
-            string fileA(argv[5]);
-            string fileB(argv[6]);
-            
+            string fileA(argv[argidx++]);
+            string fileB(argv[argidx++]);
+            string dprefix = SpHelper::GetHostPrefix();
+            if (fileA.substr(fileA.size()-3,3) != "mtx") {
+                //get dataset from map
+                fileA = datasetmap[fileA];
+            }
+            if (fileB.substr(fileB.size()-3,3) != "mtx") {
+                //get dataset from map
+                fileB = datasetmap[fileB];
+            }
+            printf("fileA %s \n", fileA.c_str());
             double t01 = MPI_Wtime();
             SpDCCols<int64_t, double> *A = ReadMat<double>(fileA, CMG, true, p);
             SpDCCols<int64_t, double> *B = ReadMat<double>(fileB, CMG, true, p);
@@ -113,17 +122,17 @@ int main(int argc, char *argv[])
         }
         else
         {
-            unsigned scale = (unsigned) atoi(argv[5]);
-            unsigned EDGEFACTOR = (unsigned) atoi(argv[6]);
+            unsigned scale = (unsigned) atoi(argv[argidx++]);
+            unsigned EDGEFACTOR = (unsigned) atoi(argv[argidx++]);
             double initiator[4];
-            if(string(argv[4]) == string("ER"))
+            if(inputtype == string("ER"))
             {
                 initiator[0] = .25;
                 initiator[1] = .25;
                 initiator[2] = .25;
                 initiator[3] = .25;
             }
-            else if(string(argv[4]) == string("G500"))
+            else if(inputtype == string("G500"))
             {
                 initiator[0] = .57;
                 initiator[1] = .19;
@@ -131,7 +140,7 @@ int main(int argc, char *argv[])
                 initiator[3] = .05;
                 EDGEFACTOR  = 16;
             }
-            else if(string(argv[4]) == string("SSCA"))
+            else if(inputtype == string("SSCA"))
             {
                 initiator[0] = .6;
                 initiator[1] = .4/3;
@@ -144,7 +153,6 @@ int main(int argc, char *argv[])
                     printf("The initiator parameter - %s - is not recognized.\n", argv[5]);
                 MPI_Abort(MPI_COMM_WORLD, 1);
             }
-            
             
             double t01 = MPI_Wtime();
             SpDCCols<int64_t, double> *A = GenMat<int64_t,double>(CMG, scale, EDGEFACTOR, initiator, true);
@@ -165,7 +173,7 @@ int main(int argc, char *argv[])
 
         
         
-        type = string(argv[7]);
+        type = string(argv[argidx++]);
         if(myrank == 0)
         {
            	printf("\n Processor Grid (row x col x layers x threads): %dx%dx%dx%d \n", CMG.GridRows, CMG.GridCols, CMG.GridLayers, nthreads);

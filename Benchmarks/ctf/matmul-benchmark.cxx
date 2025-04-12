@@ -1,13 +1,11 @@
 #include <ctf.hpp>
 #include <float.h>
-
+#include <omp.h>
 #include <iostream>
 
 using namespace CTF;
 
 typedef double REAL_T;
-
-
 
 int
 main (int argc, char **argv)

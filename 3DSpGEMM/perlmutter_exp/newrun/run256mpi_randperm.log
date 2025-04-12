@@ -1,0 +1,1015 @@
+(base) yuxihong@perlmutter:login14:/pscratch/sd/y/yuxihong/graphclustering/tmprun> OMP_NUM_THREADS=8 srun -t 10 -N 4 -n 64 -c 16 --cpu-bind=cores -q interactive -C cpu \
+>     ./3DSpGEMM/Rop --dataset \
+>     mouse_gene,ldoor,dela24,diereal,cage15,nlpkkt200 \
+>     --AA --Rop --1d --2d --3d 4,16 --check --randperm
+srun: job 22935352 queued and waiting for resources
+srun: job 22935352 has been allocated resources
+Benchmark Dataset:
+    Real Dataset:
+           mouse_gene
+           ldoor
+           dela24
+           diereal
+           cage15
+           nlpkkt200
+iteration time:5
+Benchmark Algorithm:
+    SpGEMM 1D:
+    SpGEMM 2D:
+    SpGEMM 3D, layer config: 4, 16,
+Random Permutation
+Benchmark Applications:
+    A Square
+    Restriction OP
+=============================================
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/mouse_gene.mtx
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 45101 rows 45101 columns
+642 nonzeros per Row, Total 28967291 nonzeros and 463.477 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.00104
+Timer   | Info:                  Permutation2D | Time: 0.414
+Timer   | Info:                  Permutation1D | Time: 0.0489
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 1.78
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 3.55
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer4
+Timer   | Info:      splitmatAA3D_Pr4Pc4layer4 | Time: 0.111
+Timer   | Info:      3DkernelAA3D_Pr4Pc4layer4 | Time: 2.42
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer16
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer16 | Time: 0.101
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer16 | Time: 4.27
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 4135 nonzeros and length 45101
+As a whole, mis2neighUnion has: 45101 nonzeros and length 45101
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 45101 rows 4135 columns
+1 nonzeros per Row, Total 45101 nonzeros and 0.722 MB.
+Load balance (before): 2.34425
+Load balance (after): 1.80502
+-->STATIC INFO:
+As a whole: 45101 rows 4135 columns
+1 nonzeros per Row, Total 45101 nonzeros and 0.722 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.116
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.0122
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 0.0323
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 0.0487
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.00662
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.0067
+Timer   | Info:                       RTAR1DOP | Time: 0.00768
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.00146
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.00155
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr4Pc4layer4
+Timer   | Info:     splitmatRTA3D_Pr4Pc4layer4 | Time: 0.0496
+Timer   | Info:                          RTA3D | Time: 0.0598
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer16
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer16 | Time: 0.0557
+Timer   | Info:                          RTA3D | Time: 0.0318
+3D RTA correctDone!
+
+Run RTAR3D_Pr4Pc4layer4
+Timer   | Info:    splitmatRTAR3D_Pr4Pc4layer4 | Time: 0.00598
+Timer   | Info:                         RTAR3D | Time: 0.00748
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer16
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer16 | Time: 0.00565
+Timer   | Info:                         RTAR3D | Time: 0.00428
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/ldoor.mtx
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 952203 rows 952203 columns
+48 nonzeros per Row, Total 46522475 nonzeros and 744 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.00244
+Timer   | Info:                  Permutation2D | Time: 1.27
+Timer   | Info:                  Permutation1D | Time: 0.1
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 0.871
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 1.26
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer4
+Timer   | Info:      splitmatAA3D_Pr4Pc4layer4 | Time: 0.173
+Timer   | Info:      3DkernelAA3D_Pr4Pc4layer4 | Time: 0.731
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer16
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer16 | Time: 0.172
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer16 | Time: 1.04
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 12410 nonzeros and length 952203
+As a whole, mis2neighUnion has: 952203 nonzeros and length 952203
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 952203 rows 12410 columns
+1 nonzeros per Row, Total 952203 nonzeros and 15.2 MB.
+Load balance (before): 1.09254
+Load balance (after): 1.02949
+-->STATIC INFO:
+As a whole: 952203 rows 12410 columns
+1 nonzeros per Row, Total 952203 nonzeros and 15.2 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.231
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.0174
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 0.11
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 0.188
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0042
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.00429
+Timer   | Info:                       RTAR1DOP | Time: 0.00645
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.000526
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.000592
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr4Pc4layer4
+Timer   | Info:     splitmatRTA3D_Pr4Pc4layer4 | Time: 0.0832
+Timer   | Info:                          RTA3D | Time: 0.137
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer16
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer16 | Time: 0.0884
+Timer   | Info:                          RTA3D | Time: 0.0897
+3D RTA correctDone!
+
+Run RTAR3D_Pr4Pc4layer4
+Timer   | Info:    splitmatRTAR3D_Pr4Pc4layer4 | Time: 0.00692
+Timer   | Info:                         RTAR3D | Time: 0.0114
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer16
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer16 | Time: 0.00682
+Timer   | Info:                         RTAR3D | Time: 0.00631
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/delaunay_n24.mtx
+Matrix is Boolean
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 16777216 rows 16777216 columns
+5 nonzeros per Row, Total 100663202 nonzeros and 1.61e+03 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.0139
+Timer   | Info:                  Permutation2D | Time: 4.05
+Timer   | Info:                  Permutation1D | Time: 1.01
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 2.42
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 3.17
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer4
+Timer   | Info:      splitmatAA3D_Pr4Pc4layer4 | Time: 0.373
+Timer   | Info:      3DkernelAA3D_Pr4Pc4layer4 | Time: 1.39
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer16
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer16 | Time: 0.395
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer16 | Time: 0.856
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 1649203 nonzeros and length 16777216
+As a whole, mis2neighUnion has: 16777216 nonzeros and length 16777216
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 16777216 rows 1649203 columns
+1 nonzeros per Row, Total 16777216 nonzeros and 268 MB.
+Load balance (before): 1.69327
+Load balance (after): 1.00285
+-->STATIC INFO:
+As a whole: 16777216 rows 1649203 columns
+1 nonzeros per Row, Total 16777216 nonzeros and 268 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.848
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.414
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 1.18
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 2.99
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0522
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.0523
+Timer   | Info:                       RTAR1DOP | Time: 0.102
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0125
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.0126
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr4Pc4layer4
+Timer   | Info:     splitmatRTA3D_Pr4Pc4layer4 | Time: 0.212
+Timer   | Info:                          RTA3D | Time: 0.641
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer16
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer16 | Time: 0.218
+Timer   | Info:                          RTA3D | Time: 0.406
+3D RTA correctDone!
+
+Run RTAR3D_Pr4Pc4layer4
+Timer   | Info:    splitmatRTAR3D_Pr4Pc4layer4 | Time: 0.113
+Timer   | Info:                         RTAR3D | Time: 0.251
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer16
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer16 | Time: 0.111
+Timer   | Info:                         RTAR3D | Time: 0.124
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/dielFilterV3real.mtx
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 1102824 rows 1102824 columns
+80 nonzeros per Row, Total 89306020 nonzeros and 1.43e+03 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.00254
+Timer   | Info:                  Permutation2D | Time: 1.83
+Timer   | Info:                  Permutation1D | Time: 0.196
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 2.11
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 2.48
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer4
+Timer   | Info:      splitmatAA3D_Pr4Pc4layer4 | Time: 0.334
+Timer   | Info:      3DkernelAA3D_Pr4Pc4layer4 | Time: 2.28
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer16
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer16 | Time: 0.324
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer16 | Time: 3.4
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 6154 nonzeros and length 1102824
+As a whole, mis2neighUnion has: 1102824 nonzeros and length 1102824
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 1102824 rows 6154 columns
+1 nonzeros per Row, Total 1102824 nonzeros and 17.6 MB.
+Load balance (before): 1.07355
+Load balance (after): 1.05626
+-->STATIC INFO:
+As a whole: 1102824 rows 6154 columns
+1 nonzeros per Row, Total 1102824 nonzeros and 17.6 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.378
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.0324
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 0.111
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 0.244
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.00745
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.00753
+Timer   | Info:                       RTAR1DOP | Time: 0.00981
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.000648
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.000712
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr4Pc4layer4
+Timer   | Info:     splitmatRTA3D_Pr4Pc4layer4 | Time: 0.162
+Timer   | Info:                          RTA3D | Time: 0.239
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer16
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer16 | Time: 0.168
+Timer   | Info:                          RTA3D | Time: 0.142
+3D RTA correctDone!
+
+Run RTAR3D_Pr4Pc4layer4
+Timer   | Info:    splitmatRTAR3D_Pr4Pc4layer4 | Time: 0.0113
+Timer   | Info:                         RTAR3D | Time: 0.0187
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer16
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer16 | Time: 0.0112
+Timer   | Info:                         RTAR3D | Time: 0.009
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/cage15.mtx
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 5154859 rows 5154859 columns
+19 nonzeros per Row, Total 99199551 nonzeros and 1.59e+03 MB.
+matrix Square ? 1 Symmetric ? 0
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.00699
+Timer   | Info:                  Permutation2D | Time: 4.07
+Timer   | Info:                  Permutation1D | Time: 0.377
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 2.2
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 2.82
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer4
+Timer   | Info:      splitmatAA3D_Pr4Pc4layer4 | Time: 0.442
+Timer   | Info:      3DkernelAA3D_Pr4Pc4layer4 | Time: 1.89
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer16
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer16 | Time: 0.423
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer16 | Time: 1.63
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 138356 nonzeros and length 5154859
+As a whole, mis2neighUnion has: 5154859 nonzeros and length 5154859
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 5154859 rows 138356 columns
+1 nonzeros per Row, Total 5154859 nonzeros and 82.5 MB.
+Load balance (before): 1.19874
+Load balance (after): 1.01201
+-->STATIC INFO:
+As a whole: 5154859 rows 138356 columns
+1 nonzeros per Row, Total 5154859 nonzeros and 82.5 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.615
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.287
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 0.417
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 1.78
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0589
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.059
+Timer   | Info:                       RTAR1DOP | Time: 0.107
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0146
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.0146
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr4Pc4layer4
+Timer   | Info:     splitmatRTA3D_Pr4Pc4layer4 | Time: 0.233
+Timer   | Info:                          RTA3D | Time: 0.488
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer16
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer16 | Time: 0.242
+Timer   | Info:                          RTA3D | Time: 0.33
+3D RTA correctDone!
+
+Run RTAR3D_Pr4Pc4layer4
+Timer   | Info:    splitmatRTAR3D_Pr4Pc4layer4 | Time: 0.109
+Timer   | Info:                         RTAR3D | Time: 0.167
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer16
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer16 | Time: 0.102
+Timer   | Info:                         RTAR3D | Time: 0.0877
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/nlpkkt200.mtx
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 16240000 rows 16240000 columns
+27 nonzeros per Row, Total 448225632 nonzeros and 7.17e+03 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.0168
+Timer   | Info:                  Permutation2D | Time: 16.7
+Timer   | Info:                  Permutation1D | Time: 1.45
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 11
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 12.1
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer4
+Timer   | Info:      splitmatAA3D_Pr4Pc4layer4 | Time: 1.77
+Timer   | Info:      3DkernelAA3D_Pr4Pc4layer4 | Time: 8.67
+slurmstepd: error: Detected 1 oom_kill event in StepId=22935352.0. Some of the step tasks have been OOM Killed.
+srun: error: nid005066: task 63: Out Of Memory
+srun: Terminating StepId=22935352.0
+Done!slurmstepd: error: *** STEP 22935352.0 ON nid004337 CANCELLED AT 2024-03-14T20:22:39 ***
+srun: error: nid004538: tasks 33,40,42: Terminated
+srun: error: nid004337: tasks 3,10: Terminated
+srun: error: nid004538: task 43: Terminated
+srun: error: nid004337: tasks 1,4,7-8: Terminated
+srun: error: nid004538: task 41: Terminated
+srun: error: nid004353: tasks 17,21,23-24: Terminated
+srun: error: nid004538: tasks 35,37: Terminated
+srun: error: nid004337: tasks 5,12,14: Terminated
+srun: error: nid004353: task 25: Terminated
+srun: error: nid004337: tasks 6,13: Terminated
+srun: error: nid004538: tasks 39,47: Terminated
+srun: error: nid004353: tasks 28,30: Terminated
+srun: error: nid004337: tasks 11,15: Terminated
+srun: error: nid004538: tasks 34,46: Terminated
+srun: error: nid004337: tasks 2,9: Terminated
+srun: error: nid004337: task 0: Terminated
+srun: error: nid004538: tasks 36,38,44-45: Terminated
+srun: error: nid004538: task 32: Terminated
+srun: error: nid004353: tasks 19,22,26-27: Terminated
+srun: error: nid004353: task 20: Terminated
+srun: error: nid004353: tasks 16,18,29,31: Terminated
+srun: Force Terminated StepId=22935352.0
+(base) yuxihong@perlmutter:login14:/pscratch/sd/y/yuxihong/graphclustering/tmprun> OMP_NUM_THREADS=2 srun -t 10 -N 4 -n 256 -c 4 --cpu-bind=cores -q interactive -C cpu \
+>     ./3DSpGEMM/Rop --dataset mouse_gene,ldoor,dela24,diereal,cage15 \
+>     --AA --Rop --1d --2d --3d 4,16,64 --check
+srun: job 22935518 queued and waiting for resources
+^C^C^C^Csrun: Force Terminated JobId=22935518
+srun: Job allocation 22935518 has been revoked
+(base) yuxihong@perlmutter:login14:/pscratch/sd/y/yuxihong/graphclustering/tmprun> ^C
+(base) yuxihong@perlmutter:login14:/pscratch/sd/y/yuxihong/graphclustering/tmprun> ^C
+(base) yuxihong@perlmutter:login14:/pscratch/sd/y/yuxihong/graphclustering/tmprun> OMP_NUM_THREADS=2 srun -t 10 -N 4 -n 256 -c 4 --cpu-bind=cores -q interactive -C cpu     ./3DSpGEMM/Rop --dataset mouse_gene,ldoor,dela24,diereal,cage15     --AA --Rop --1d --2d --3d 4,16,64 --check --randperm
+srun: job 22935519 queued and waiting for resources
+srun: job 22935519 has been allocated resources
+Benchmark Dataset:
+    Real Dataset:
+           mouse_gene
+           ldoor
+           dela24
+           diereal
+           cage15
+iteration time:5
+Benchmark Algorithm:
+    SpGEMM 1D:
+    SpGEMM 2D:
+    SpGEMM 3D, layer config: 4, 16, 64,
+Random Permutation
+Benchmark Applications:
+    A Square
+    Restriction OP
+=============================================
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/mouse_gene.mtx
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 45101 rows 45101 columns
+642 nonzeros per Row, Total 28967291 nonzeros and 463.477 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.0024
+Timer   | Info:                  Permutation2D | Time: 0.33
+Timer   | Info:                  Permutation1D | Time: 0.0894
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 2.39
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 7.79
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr8Pc8layer4
+Timer   | Info:      splitmatAA3D_Pr8Pc8layer4 | Time: 0.0693
+Timer   | Info:      3DkernelAA3D_Pr8Pc8layer4 | Time: 2.56
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer16
+Timer   | Info:     splitmatAA3D_Pr4Pc4layer16 | Time: 0.0519
+Timer   | Info:     3DkernelAA3D_Pr4Pc4layer16 | Time: 4.4
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer64
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer64 | Time: 0.0509
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer64 | Time: 8.68
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 4057 nonzeros and length 45101
+As a whole, mis2neighUnion has: 45101 nonzeros and length 45101
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 45101 rows 4057 columns
+1 nonzeros per Row, Total 45101 nonzeros and 0.722 MB.
+Load balance (before): 4.51821
+Load balance (after): 2.8324
+-->STATIC INFO:
+As a whole: 45101 rows 4057 columns
+1 nonzeros per Row, Total 45101 nonzeros and 0.722 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.121
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.00763
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 0.0512
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 0.0556
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0115
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.0116
+Timer   | Info:                       RTAR1DOP | Time: 0.0108
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.00144
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.00153
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr8Pc8layer4
+Timer   | Info:     splitmatRTA3D_Pr8Pc8layer4 | Time: 0.0292
+Timer   | Info:                          RTA3D | Time: 0.0619
+3D RTA correctDone!
+
+Run RTA3D_Pr4Pc4layer16
+Timer   | Info:    splitmatRTA3D_Pr4Pc4layer16 | Time: 0.0278
+Timer   | Info:                          RTA3D | Time: 0.0327
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer64
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer64 | Time: 0.027
+Timer   | Info:                          RTA3D | Time: 0.0229
+3D RTA correctDone!
+
+Run RTAR3D_Pr8Pc8layer4
+Timer   | Info:    splitmatRTAR3D_Pr8Pc8layer4 | Time: 0.0039
+Timer   | Info:                         RTAR3D | Time: 0.00478
+3D RTAR correctDone!
+
+Run RTAR3D_Pr4Pc4layer16
+Timer   | Info:   splitmatRTAR3D_Pr4Pc4layer16 | Time: 0.0034
+Timer   | Info:                         RTAR3D | Time: 0.00327
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer64
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer64 | Time: 0.00314
+Timer   | Info:                         RTAR3D | Time: 0.00281
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/ldoor.mtx
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 952203 rows 952203 columns
+48 nonzeros per Row, Total 46522475 nonzeros and 744 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.00273
+Timer   | Info:                  Permutation2D | Time: 1.57
+Timer   | Info:                  Permutation1D | Time: 0.195
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 0.925
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 5.36
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr8Pc8layer4
+Timer   | Info:      splitmatAA3D_Pr8Pc8layer4 | Time: 0.0992
+Timer   | Info:      3DkernelAA3D_Pr8Pc8layer4 | Time: 0.773
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer16
+Timer   | Info:     splitmatAA3D_Pr4Pc4layer16 | Time: 0.0866
+Timer   | Info:     3DkernelAA3D_Pr4Pc4layer16 | Time: 1.01
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer64
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer64 | Time: 0.0843
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer64 | Time: 1.27
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 12424 nonzeros and length 952203
+As a whole, mis2neighUnion has: 952203 nonzeros and length 952203
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 952203 rows 12424 columns
+1 nonzeros per Row, Total 952203 nonzeros and 15.2 MB.
+Load balance (before): 1.24505
+Load balance (after): 1.05712
+-->STATIC INFO:
+As a whole: 952203 rows 12424 columns
+1 nonzeros per Row, Total 952203 nonzeros and 15.2 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.294
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.0151
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 0.729
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 0.679
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.00948
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.00957
+Timer   | Info:                       RTAR1DOP | Time: 0.00611
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.00126
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.00135
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr8Pc8layer4
+Timer   | Info:     splitmatRTA3D_Pr8Pc8layer4 | Time: 0.0466
+Timer   | Info:                          RTA3D | Time: 0.168
+3D RTA correctDone!
+
+Run RTA3D_Pr4Pc4layer16
+Timer   | Info:    splitmatRTA3D_Pr4Pc4layer16 | Time: 0.0423
+Timer   | Info:                          RTA3D | Time: 0.0973
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer64
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer64 | Time: 0.043
+Timer   | Info:                          RTA3D | Time: 0.0771
+3D RTA correctDone!
+
+Run RTAR3D_Pr8Pc8layer4
+Timer   | Info:    splitmatRTAR3D_Pr8Pc8layer4 | Time: 0.00452
+Timer   | Info:                         RTAR3D | Time: 0.0104
+3D RTAR correctDone!
+
+Run RTAR3D_Pr4Pc4layer16
+Timer   | Info:   splitmatRTAR3D_Pr4Pc4layer16 | Time: 0.00467
+Timer   | Info:                         RTAR3D | Time: 0.00606
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer64
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer64 | Time: 0.00504
+Timer   | Info:                         RTAR3D | Time: 0.00513
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/delaunay_n24.mtx
+Matrix is Boolean
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 16777216 rows 16777216 columns
+5 nonzeros per Row, Total 100663202 nonzeros and 1.61e+03 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.0213
+Timer   | Info:                  Permutation2D | Time: 5.15
+Timer   | Info:                  Permutation1D | Time: 2.41
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 2.17
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 25.4
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr8Pc8layer4
+Timer   | Info:      splitmatAA3D_Pr8Pc8layer4 | Time: 0.197
+Timer   | Info:      3DkernelAA3D_Pr8Pc8layer4 | Time: 1.45
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer16
+Timer   | Info:     splitmatAA3D_Pr4Pc4layer16 | Time: 0.191
+Timer   | Info:     3DkernelAA3D_Pr4Pc4layer16 | Time: 0.945
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer64
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer64 | Time: 0.186
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer64 | Time: 0.835
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 1649243 nonzeros and length 16777216
+As a whole, mis2neighUnion has: 16777216 nonzeros and length 16777216
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 16777216 rows 1649243 columns
+1 nonzeros per Row, Total 16777216 nonzeros and 268 MB.
+Load balance (before): 2.48439
+Load balance (after): 1.0088
+-->STATIC INFO:
+As a whole: 16777216 rows 1649243 columns
+1 nonzeros per Row, Total 16777216 nonzeros and 268 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.888
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.305
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 7.52
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 3.87
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0562
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.0564
+Timer   | Info:                       RTAR1DOP | Time: 0.124
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0214
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.0215
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr8Pc8layer4
+Timer   | Info:     splitmatRTA3D_Pr8Pc8layer4 | Time: 0.109
+Timer   | Info:                          RTA3D | Time: 0.668
+3D RTA correctDone!
+
+Run RTA3D_Pr4Pc4layer16
+Timer   | Info:    splitmatRTA3D_Pr4Pc4layer16 | Time: 0.101
+Timer   | Info:                          RTA3D | Time: 0.49
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer64
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer64 | Time: 0.0996
+Timer   | Info:                          RTA3D | Time: 0.619
+3D RTA correctDone!
+
+Run RTAR3D_Pr8Pc8layer4
+Timer   | Info:    splitmatRTAR3D_Pr8Pc8layer4 | Time: 0.0592
+Timer   | Info:                         RTAR3D | Time: 0.205
+3D RTAR correctDone!
+
+Run RTAR3D_Pr4Pc4layer16
+Timer   | Info:   splitmatRTAR3D_Pr4Pc4layer16 | Time: 0.0528
+Timer   | Info:                         RTAR3D | Time: 0.139
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer64
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer64 | Time: 0.0506
+Timer   | Info:                         RTAR3D | Time: 0.0906
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/dielFilterV3real.mtx
+Matrix is symmetric
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 1102824 rows 1102824 columns
+80 nonzeros per Row, Total 89306020 nonzeros and 1.43e+03 MB.
+matrix Square ? 1 Symmetric ? 1
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.00437
+Timer   | Info:                  Permutation2D | Time: 2.49
+Timer   | Info:                  Permutation1D | Time: 0.613
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 2.36
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 16.9
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr8Pc8layer4
+Timer   | Info:      splitmatAA3D_Pr8Pc8layer4 | Time: 0.233
+Timer   | Info:      3DkernelAA3D_Pr8Pc8layer4 | Time: 8.62
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer16
+Timer   | Info:     splitmatAA3D_Pr4Pc4layer16 | Time: 0.182
+Timer   | Info:     3DkernelAA3D_Pr4Pc4layer16 | Time: 3.28
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer64
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer64 | Time: 0.221
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer64 | Time: 4.48
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 6206 nonzeros and length 1102824
+As a whole, mis2neighUnion has: 1102824 nonzeros and length 1102824
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 1102824 rows 6206 columns
+1 nonzeros per Row, Total 1102824 nonzeros and 17.6 MB.
+Load balance (before): 1.13419
+Load balance (after): 1.088
+-->STATIC INFO:
+As a whole: 1102824 rows 6206 columns
+1 nonzeros per Row, Total 1102824 nonzeros and 17.6 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.463
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.0209
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 0.562
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 0.158
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0102
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.0103
+Timer   | Info:                       RTAR1DOP | Time: 0.0163
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.00145
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.00154
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr8Pc8layer4
+Timer   | Info:     splitmatRTA3D_Pr8Pc8layer4 | Time: 0.0857
+Timer   | Info:                          RTA3D | Time: 0.281
+3D RTA correctDone!
+
+Run RTA3D_Pr4Pc4layer16
+Timer   | Info:    splitmatRTA3D_Pr4Pc4layer16 | Time: 0.0956
+Timer   | Info:                          RTA3D | Time: 0.152
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer64
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer64 | Time: 0.0939
+Timer   | Info:                          RTA3D | Time: 0.128
+3D RTA correctDone!
+
+Run RTAR3D_Pr8Pc8layer4
+Timer   | Info:    splitmatRTAR3D_Pr8Pc8layer4 | Time: 0.00817
+Timer   | Info:                         RTAR3D | Time: 0.014
+3D RTAR correctDone!
+
+Run RTAR3D_Pr4Pc4layer16
+Timer   | Info:   splitmatRTAR3D_Pr4Pc4layer16 | Time: 0.0138
+Timer   | Info:                         RTAR3D | Time: 0.0103
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer64
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer64 | Time: 0.00756
+Timer   | Info:                         RTAR3D | Time: 0.00743
+3D RTAR correctDone!
+
+reading mtx file /global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/cage15.mtx
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+-->STATIC INFO:
+As a whole: 5154859 rows 5154859 columns
+19 nonzeros per Row, Total 99199551 nonzeros and 1.59e+03 MB.
+matrix Square ? 1 Symmetric ? 0
+appying random permutation on matrix
+Timer   | Info:                   GenRandomSeq | Time: 0.0114
+Timer   | Info:                  Permutation2D | Time: 5.9
+Timer   | Info:                  Permutation1D | Time: 0.844
+Run 2d AA test:
+Timer   | Info:                           AA2D | Time: 2.69
+Done!
+
+Run 1d AA test:
+Timer   | Info:                           AA1D | Time: 20.4
+Done!1D AA is correct!Done!
+
+Run AA3D_Pr8Pc8layer4
+Timer   | Info:      splitmatAA3D_Pr8Pc8layer4 | Time: 0.237
+Timer   | Info:      3DkernelAA3D_Pr8Pc8layer4 | Time: 7.08
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr4Pc4layer16
+Timer   | Info:     splitmatAA3D_Pr4Pc4layer16 | Time: 0.242
+Timer   | Info:     3DkernelAA3D_Pr4Pc4layer16 | Time: 12
+Done!3D AA is correct!Done!
+
+Run AA3D_Pr2Pc2layer64
+Timer   | Info:     splitmatAA3D_Pr2Pc2layer64 | Time: 0.222
+Timer   | Info:     3DkernelAA3D_Pr2Pc2layer64 | Time: 5.55
+Done!3D AA is correct!Done!
+
+As a whole, mis2 has: 138331 nonzeros and length 5154859
+As a whole, mis2neighUnion has: 5154859 nonzeros and length 5154859
+Rop final (before normalization)...
+-->STATIC INFO:
+As a whole: 5154859 rows 138331 columns
+1 nonzeros per Row, Total 5154859 nonzeros and 82.5 MB.
+Load balance (before): 1.41353
+Load balance (after): 1.02919
+-->STATIC INFO:
+As a whole: 5154859 rows 138331 columns
+1 nonzeros per Row, Total 5154859 nonzeros and 82.5 MB.
+Run 2d RT x A test:
+Timer   | Info:                          RTA2D | Time: 0.875
+Done!
+Run 2d RTA x R test:
+Timer   | Info:                         RTAR2D | Time: 0.166
+Done!
+
+Run 1d RT x A test!
+Timer   | Info:                          RTA1D | Time: 2.38
+1D RTA is correct!Done!
+
+Run RTAR 1D test!
+Timer   | Info:                         RTAR1D | Time: 1.31
+1D RTAR is correct!Done!
+
+Run RTAR 1D OP test!
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0995
+Timer   | Info:                 RTA1DOP-TransA | Time: 0.0996
+Timer   | Info:                       RTAR1DOP | Time: 0.187
+Timer   | Info:             SpGEMM1D-Transpose | Time: 0.0143
+Timer   | Info:                RTAR1DOP-TransC | Time: 0.0144
+1D OP RTAR is correct!Done!
+
+Run RTA3D_Pr8Pc8layer4
+Timer   | Info:     splitmatRTA3D_Pr8Pc8layer4 | Time: 0.119
+Timer   | Info:                          RTA3D | Time: 0.615
+3D RTA correctDone!
+
+Run RTA3D_Pr4Pc4layer16
+Timer   | Info:    splitmatRTA3D_Pr4Pc4layer16 | Time: 0.121
+Timer   | Info:                          RTA3D | Time: 0.34
+3D RTA correctDone!
+
+Run RTA3D_Pr2Pc2layer64
+Timer   | Info:    splitmatRTA3D_Pr2Pc2layer64 | Time: 0.124
+Timer   | Info:                          RTA3D | Time: 0.25
+3D RTA correctDone!
+
+Run RTAR3D_Pr8Pc8layer4
+Timer   | Info:    splitmatRTAR3D_Pr8Pc8layer4 | Time: 0.0569
+Timer   | Info:                         RTAR3D | Time: 0.127
+3D RTAR correctDone!
+
+Run RTAR3D_Pr4Pc4layer16
+Timer   | Info:   splitmatRTAR3D_Pr4Pc4layer16 | Time: 0.056
+Timer   | Info:                         RTAR3D | Time: 0.0734
+3D RTAR correctDone!
+
+Run RTAR3D_Pr2Pc2layer64
+Timer   | Info:   splitmatRTAR3D_Pr2Pc2layer64 | Time: 0.0492
+Timer   | Info:                         RTAR3D | Time: 0.053
+3D RTAR correctDone!

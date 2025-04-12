@@ -1,0 +1,22 @@
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+/global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/cage15.mtx.graph exists , deleted it.
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+matrix is not symm before, do symm!!!
+      Setup: Max:   0.767, Sum:  12.278, Balance:   1.000
+   Matching: Max:   0.335, Sum:   5.360, Balance:   1.000
+Contraction: Max:   0.341, Sum:   5.458, Balance:   1.000
+   InitPart: Max:   0.013, Sum:   0.206, Balance:   1.000
+    Project: Max:   0.003, Sum:   0.037, Balance:   1.123
+ Initialize: Max:   0.183, Sum:   2.911, Balance:   1.004
+      K-way: Max:   0.568, Sum:   9.082, Balance:   1.000
+      Remap: Max:   0.001, Sum:   0.009, Balance:   1.011
+      Total: Max:   2.209, Sum:  35.350, Balance:   1.000
+we run partitioner in 2213.12 ms!
+/global/cfs/cdirs/m1982/yuxihong/spgemm1ddataset/cage15.mtx.16.txt exists , deleted it.
+MPIIO WARNING: DVS stripe width of 24 was requested but DVS set it to 1
+See MPICH_MPIIO_DVS_MAXNODES in the intro_mpi man page.
+order.txt exists , deleted it.
+totnvtx 5154859 metis nvtxs 5154859
+permute time 4.982918 s

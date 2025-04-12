@@ -1,0 +1,45 @@
+MPI Size: 64 Threads Numbers: 16
+random permutation!
+Reading input file....
+Matrix is symmetric
+As a whole: 1102824 rows and 1102824 columns and 89306020 nonzeros and 1428.9 MB.
+Reader took 0.59859 seconds
+Generating random permutation vector.
+Perfoming random permuation of matrix.
+Permutation took 2.03101 seconds
+Input load balance: 1.09111
+Reading matrix: /pscratch/sd/y/yuxihong/graphclustering/dataset/1DspGEMM/dielFilterV3real.mtx
+Computing restriction matrix
+As a whole: 1102824 rows and 1102824 columns and 88203196 nonzeros and 793.829 MB.
+As a whole, mis2 has: 6174 nonzeros and length 1102824
+As a whole, mis2neighUnion has: 1102824 nonzeros and length 1102824
+As a whole: 1102824 rows and 6174 columns and 1102824 nonzeros and 17.6452 MB.
+Rop final (before normalization)... Load balance (before): 1.05185
+Load balance (after): 1.0425
+Restriction Op computed : time 0.951328
+=============A square============
+Timer|Info: AA_2D|Time: 1.818228
+Timer|Info: AA_1D_CBC|Time: 2.468089
+nnz(A)=   89306020
+nnz(AA)=  688649400
+AA pass!
+=============RT * A============
+Timer|Info: RTA_2D|Time: 0.307065
+Timer|Info: CBC_RTA_1D|Time: 0.117894
+nnz(RT)=  1102824
+nnz(A)=   89306020
+nnz(RTA)= 4308503
+RTA pass!
+=============RTA * R============
+Timer|Info: RTAR_2D|Time: 0.035333
+Timer|Info: RTAR_1D|Time: 0.222881
+nnz(RTA)= 4308503
+nnz(R)=   1102824
+nnz(RTAR)=99466
+cbc-RTAR pass!
+=============RTA * R Out Product============
+Timer|Info: RTAR_1DOP|Time: 0.008442
+nnz(RTA)= 4308503
+nnz(R)=   1102824
+nnz(RTAR)=99466
+cbc-RTAR-1DOP outproduct pass!

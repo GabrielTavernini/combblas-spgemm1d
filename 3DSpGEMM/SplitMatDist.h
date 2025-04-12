@@ -27,8 +27,10 @@
 namespace combblas {
 
 template <typename NT, typename IT>
-SpDCCols<IT,NT> * ReadMat(std::string filename, CCGrid & CMG, bool permute, FullyDistVec<IT, IT>& p)
+SpDCCols<IT,NT> * ReadMat(std::string filename, CCGrid & CMG, int permute, FullyDistVec<IT, IT>& p)
 {
+    int myrank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
     double t01 = MPI_Wtime();
     double t02;
     if(CMG.layer_grid == 0)
@@ -46,7 +48,7 @@ SpDCCols<IT,NT> * ReadMat(std::string filename, CCGrid & CMG, bool permute, Full
         SpParHelper::Print(tinfo.str());
         
         // random permutations for load balance
-        if(permute)
+        if(permute == 1)
         {
             if(A->getnrow() == A->getncol())
             {
@@ -59,6 +61,29 @@ SpDCCols<IT,NT> * ReadMat(std::string filename, CCGrid & CMG, bool permute, Full
                 SpParHelper::Print("Perfoming random permuation of matrix.\n");
                 (*A)(p,p,true);// in-place permute to save memory
                 std::ostringstream tinfo1;
+                tinfo1 << "Random Permutation took " << MPI_Wtime()-t02 << " seconds" << std::endl;
+                SpParHelper::Print(tinfo1.str());
+            }
+            else
+            {
+                SpParHelper::Print("nrow != ncol. Can not apply symmetric permutation.\n");
+            }
+        }else if(permute == 2) // using graph partition results
+        {
+            if(A->getnrow() == A->getncol())
+            {
+                SpParMat < IT, NT, SpDCCols<IT,NT> > AT(*A);
+                AT.Transpose();
+                if( (*A) == AT ){
+                    if(myrank==0)printf("matrix is symm, no need for add transpose.\n");
+                }else{
+                    if(myrank==0)printf("matrix is not symm, I will add transpose to make it symm and adapt GP results.\n");
+                    (*A) += AT;
+                }
+                SpParHelper::Print("Perfoming gp permuation of matrix.\n");
+                t02 = MPI_Wtime();
+                (*A)(p,p,true);// in-place permute to save memory
+                std::ostringstream tinfo1;
                 tinfo1 << "Permutation took " << MPI_Wtime()-t02 << " seconds" << std::endl;
                 SpParHelper::Print(tinfo1.str());
             }
@@ -66,7 +91,7 @@ SpDCCols<IT,NT> * ReadMat(std::string filename, CCGrid & CMG, bool permute, Full
             {
                 SpParHelper::Print("nrow != ncol. Can not apply symmetric permutation.\n");
             }
-        }
+        }   
         
        	float balance = A->LoadImbalance();
         std::ostringstream outs;
@@ -108,7 +133,7 @@ SpDCCols<IT,NT> * GenMat(CCGrid & CMG, unsigned scale, unsigned EDGEFACTOR, doub
         SpParHelper::Print("Created Sparse Matrix\n");
         A->PrintInfo();
         
-        
+
         if(permute)
         {
             SpParHelper::Print("Perfoming random permuation of matrix.\n");
@@ -122,9 +147,6 @@ SpDCCols<IT,NT> * GenMat(CCGrid & CMG, unsigned scale, unsigned EDGEFACTOR, doub
             tinfo1 << "Permutation took " << MPI_Wtime()-t02 << " seconds" << std::endl;
             SpParHelper::Print(tinfo1.str());
         }
-         
-        
-        
         float balance = A->LoadImbalance();
         std::ostringstream outs;
         outs << "Load balance: " << balance << std::endl;
@@ -207,8 +229,8 @@ void SplitMat(CCGrid & CMG, SpDCCols<IT, NT> * localmat, SpDCCols<IT,NT> & split
     
     if(rowsplit && nparts>1) splitmat.Transpose(); //transpose back after row-splitting
     std::ostringstream tinfo;
-    tinfo << "Matrix split and distributed along layers: time " << MPI_Wtime()-t01 << " seconds" << std::endl;
-    SpParHelper::Print(tinfo.str());
+    // tinfo << "Matrix split and distributed along layers: time " << MPI_Wtime()-t01 << " seconds" << std::endl;
+    // SpParHelper::Print(tinfo.str());
     
 }
 

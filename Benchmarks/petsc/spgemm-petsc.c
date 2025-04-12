@@ -37,7 +37,7 @@ main (int argc, char **argv)
 
 	MatGetSize(A, &m, &n);
 	MatGetInfo(A, MAT_GLOBAL_SUM, &info);
-	PetscPrintf(PETSC_COMM_WORLD, "A matrix size %d %d %lld\n",
+	PetscPrintf(PETSC_COMM_WORLD, "A matrix size %d %d %ld\n",
 				m, n, (long long int)info.nz_used);
 
 	PetscPrintf(PETSC_COMM_WORLD, "reading matrix %s (B)\n", argv[2]);
@@ -49,7 +49,7 @@ main (int argc, char **argv)
 
 	MatGetSize(B, &m, &n);
 	MatGetInfo(B, MAT_GLOBAL_SUM, &info);
-	PetscPrintf(PETSC_COMM_WORLD, "B matrix size %d %d %lld\n",
+	PetscPrintf(PETSC_COMM_WORLD, "B matrix size %d %d %ld\n",
 				m, n, (long long int)info.nz_used);
 
 	double read_mat_end = MPI_Wtime();
@@ -70,7 +70,7 @@ main (int argc, char **argv)
 
 	MatGetSize(C, &m, &n);
 	MatGetInfo(C, MAT_GLOBAL_SUM, &info);
-	PetscPrintf(PETSC_COMM_WORLD, "C matrix size %d %d %lld\n",
+	PetscPrintf(PETSC_COMM_WORLD, "C matrix size %d %d %ld\n",
 				m, n, (long long int)info.nz_used);
 
 
